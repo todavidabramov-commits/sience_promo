@@ -33,7 +33,7 @@ export function Reveal({ children, className, delay = 0, compact = false, ...res
         y: 0,
         filter: 'blur(0px)',
       }}
-      viewport={{ once: true, amount: 0.18, margin: '0px 0px -6% 0px' }}
+      viewport={{ once: true, amount: 0.05, margin: '0px 0px -40px 0px' }}
       transition={{ duration: compact ? 0.55 : 0.8, delay, ease: EASE }}
       {...rest}
     >
@@ -67,7 +67,7 @@ export function RevealStagger({
       className={className}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.12, margin: '0px 0px -4% 0px' }}
+      viewport={{ once: true, amount: 0.05, margin: '0px 0px -40px 0px' }}
       variants={{
         hidden: {},
         show: {
