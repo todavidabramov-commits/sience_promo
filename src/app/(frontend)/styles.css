@@ -26,7 +26,6 @@
 html {
   scroll-behavior: smooth;
   background: var(--navy-900);
-  overscroll-behavior-y: none;
 }
 
 body {
@@ -37,7 +36,6 @@ body {
   font-family: var(--font-body);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-  overscroll-behavior-y: none;
 }
 
 body.nav-open {
@@ -2743,7 +2741,7 @@ p {
   background: transparent;
   color: var(--ink);
   font: inherit;
-  font-size: 14px;
+  font-size: 16px;
   appearance: none;
 }
 
@@ -3143,6 +3141,19 @@ p {
 
   .pubs-filters {
     width: 100%;
+  }
+
+  .docs-search input,
+  .docs-search input:focus,
+  .docs-search input:focus-visible,
+  .pubs-digest__form input,
+  .home-form input:not([type='hidden']):not([type='file']),
+  .home-form textarea,
+  .home-form select,
+  .form input,
+  .form textarea,
+  .form select {
+    font-size: 16px;
   }
 
   .contacts-channels,
