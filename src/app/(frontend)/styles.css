@@ -200,7 +200,7 @@ p {
   height: 88px;
   overflow: hidden;
   backdrop-filter: none;
-  background: color-mix(in srgb, var(--navy-950) 88%, transparent);
+  background: var(--navy-900);
   border-bottom: 1px solid rgb(255 255 255 / 0.08);
 }
 
@@ -882,11 +882,27 @@ p {
     width: 100%;
     z-index: 50;
     overflow: hidden;
+    background: var(--navy-900);
   }
 
   .site-header__inner,
   .site-header.is-nav-open .site-header__inner {
+    position: relative;
+    z-index: 2;
     overflow: hidden;
+    background: var(--navy-900);
+  }
+
+  .site-header.is-nav-open .site-header__inner::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 88px;
+    z-index: 40;
+    pointer-events: none;
+    background: var(--navy-900);
   }
 
   .site-header__spacer {
@@ -921,15 +937,18 @@ p {
   .nav.is-open {
     display: flex;
     position: fixed;
-    inset: 0;
+    top: 88px;
+    right: 0;
+    bottom: 0;
+    left: 0;
     width: 100%;
     height: auto;
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
     gap: 24px;
-    padding: 5.5rem 1.25rem 1.5rem;
-    background: var(--navy-950);
+    padding: 1rem 1.25rem 1.5rem;
+    background: var(--navy-900);
     border-bottom: 0;
     overflow-x: hidden;
     overflow-y: auto;
@@ -1005,6 +1024,7 @@ p {
   box-sizing: border-box;
   padding-inline: clamp(1.25rem, 4vw, 80px);
   overflow: hidden;
+  background: var(--navy-900);
 }
 
 .site-header.is-nav-open .site-header__inner {
@@ -4153,14 +4173,17 @@ p {
   .nav.is-open {
     display: flex;
     position: fixed;
-    inset: 0;
+    top: 88px;
+    right: 0;
+    bottom: 0;
+    left: 0;
     width: 100%;
     height: auto;
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
     gap: 24px;
-    padding: calc(88px + 1rem) clamp(1.25rem, 4vw, 80px) 2rem;
+    padding: 1rem clamp(1.25rem, 4vw, 80px) 2rem;
     background: var(--navy-900);
     border-bottom: 0;
     overflow-x: hidden;
@@ -4277,6 +4300,50 @@ p {
   .home-section__head--row {
     flex-direction: column;
     align-items: start;
+  }
+
+  .about-principle,
+  .about-licence,
+  .services-card,
+  .pubs-card,
+  .experts-row,
+  .experts-step,
+  .docs-card,
+  .contacts-card,
+  .home-metric {
+    padding: 16px;
+  }
+
+  .about-timeline__item,
+  .home-service,
+  .home-industry,
+  .home-case__body,
+  .home-step {
+    padding: 12px;
+  }
+
+  .service-detail__stage {
+    padding: 14px;
+  }
+
+  .pubs-featured,
+  .projects-case,
+  .contacts-map__info,
+  .contacts-reqs,
+  .home-form--proposal {
+    padding: 20px;
+  }
+
+  .about-cta__inner {
+    padding-block: 32px;
+  }
+
+  .site-footer {
+    padding: 40px 0 24px;
+  }
+
+  .site-footer__company {
+    padding: 12px;
   }
 }
 
