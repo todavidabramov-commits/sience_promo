@@ -76,11 +76,9 @@ export default function HomePage() {
 
       <section className="home-section">
         <div className="home-wrap">
-          <Reveal className="home-section__head home-section__head--split">
-            <div>
-              <span className="home-tag">Направления деятельности</span>
-              <h2>Комплексные исследования и гигиеническая оценка рисков</h2>
-            </div>
+          <Reveal className="home-section__head">
+            <span className="home-tag">Направления деятельности</span>
+            <h2>Комплексные исследования и гигиеническая оценка рисков</h2>
             <p className="home-section__aside">
               Разрабатываем технические решения, строго соответствующие федеральному законодательству
               и методикам Минприроды и Роспотребнадзора.

@@ -55,13 +55,20 @@ export default function ExpertsPage() {
             {EXPERT_BOARD.map((expert) => (
               <RevealItem key={expert.slug}>
                 <article className="experts-row">
-                  <div className="experts-row__meta">
+                  <div className="experts-row__media">
+                    <Image
+                      src={expert.image}
+                      alt={expert.name}
+                      fill
+                      quality={100}
+                      sizes="(max-width: 980px) 100vw, 200px"
+                    />
+                  </div>
+                  <div className="experts-row__body">
                     <span className="experts-row__badge">{expert.title}</span>
                     <h3>{expert.name}</h3>
-                    <p>{expert.credentials}</p>
-                  </div>
-                  <div className="experts-row__spec">
-                    <p>{expert.bio}</p>
+                    <p className="experts-row__creds">{expert.credentials}</p>
+                    <p className="experts-row__bio">{expert.bio}</p>
                     <div className="experts-row__tags">
                       {expert.tags.map((tag) => (
                         <span key={tag}>{tag}</span>

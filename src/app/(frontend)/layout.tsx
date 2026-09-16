@@ -36,6 +36,11 @@ export default async function FrontendLayout({ children }: { children: React.Rea
           companyName={companyName}
           tagline={settings?.tagline || 'Экспертный центр'}
           phone={settings?.phone || '+7 (495) 120-44-88'}
+          email={settings?.email || 'info@sanepidexpert.ru'}
+          address={
+            settings?.address ||
+            '119049, г. Москва, Ленинский проспект, д. 8, стр. 16, Научно-исследовательский кластер'
+          }
           nav={header?.nav?.map((item) => ({ label: item.label, href: item.href }))}
           ctaLabel={header?.ctaLabel}
           ctaHref={header?.ctaHref}
