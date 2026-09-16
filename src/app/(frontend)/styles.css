@@ -1527,8 +1527,9 @@ p {
   }
 
   .rise-ring {
-    opacity: 0.22;
-    transform: translate(-50%, 68%) scale(1);
+    opacity: 0.28;
+    transform: translate(-50%, 62%) scale(1);
+    transition: none;
   }
 
   .nav__links > a {
@@ -2379,67 +2380,48 @@ p {
   line-height: 1.4;
 }
 
-.is-rise-rings {
-  --rise-scale: clamp(0.42, calc((100vw - 280px) / 1160), 1);
-}
-
 .rise-ring {
   position: absolute;
   left: 50%;
   bottom: 0;
   z-index: 0;
+  display: block;
   border: 1px solid var(--cyan-400);
   border-radius: 50%;
   pointer-events: none;
   opacity: 0;
-  transform: translate(-50%, 108%) scale(0.35);
+  transform: translate(-50%, 92%) scale(0.42);
+  transition:
+    transform 2.8s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 1.8s ease;
 }
 
 .rise-ring:nth-child(1) {
-  width: calc(1100px * var(--rise-scale));
-  height: calc(1100px * var(--rise-scale));
+  width: 1100px;
+  height: 1100px;
 }
 
 .rise-ring:nth-child(2) {
-  width: calc(860px * var(--rise-scale));
-  height: calc(860px * var(--rise-scale));
+  width: 860px;
+  height: 860px;
+  transition-delay: 0.18s;
 }
 
 .rise-ring:nth-child(3) {
-  width: calc(640px * var(--rise-scale));
-  height: calc(640px * var(--rise-scale));
+  width: 640px;
+  height: 640px;
+  transition-delay: 0.36s;
 }
 
 .rise-ring:nth-child(4) {
-  width: calc(440px * var(--rise-scale));
-  height: calc(440px * var(--rise-scale));
+  width: 440px;
+  height: 440px;
+  transition-delay: 0.54s;
 }
 
 .is-rise-rings.is-inview .rise-ring {
-  animation: pubs-digest-ring 2.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.is-rise-rings.is-inview .rise-ring:nth-child(2) {
-  animation-delay: 0.28s;
-}
-
-.is-rise-rings.is-inview .rise-ring:nth-child(3) {
-  animation-delay: 0.56s;
-}
-
-.is-rise-rings.is-inview .rise-ring:nth-child(4) {
-  animation-delay: 0.84s;
-}
-
-@keyframes pubs-digest-ring {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 115%) scale(0.28);
-  }
-  to {
-    opacity: 0.28;
-    transform: translate(-50%, 68%) scale(1);
-  }
+  opacity: 0.34;
+  transform: translate(-50%, 62%) scale(1);
 }
 
 .pubs-digest__form {
@@ -2750,8 +2732,8 @@ p {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  flex: 0 0 280px;
-  width: 280px;
+  flex: 0 0 380px;
+  width: 380px;
   max-width: 100%;
   gap: 8px;
   margin-left: auto;
@@ -2762,7 +2744,8 @@ p {
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 12px;
+  min-height: 48px;
+  padding: 12px 14px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
