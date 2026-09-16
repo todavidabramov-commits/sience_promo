@@ -926,13 +926,14 @@ p {
     height: auto;
     flex-direction: column;
     align-items: stretch;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 24px;
     padding: 5.5rem 1.25rem 1.5rem;
     background: var(--navy-950);
     border-bottom: 0;
-    overflow: hidden;
-    overscroll-behavior: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     z-index: 35;
   }
 
@@ -4174,13 +4175,14 @@ p {
     height: auto;
     flex-direction: column;
     align-items: stretch;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 24px;
     padding: calc(88px + 1rem) clamp(1.25rem, 4vw, 80px) 2rem;
     background: var(--navy-900);
     border-bottom: 0;
-    overflow: hidden;
-    overscroll-behavior: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     z-index: 35;
   }
 
@@ -4190,8 +4192,8 @@ p {
     align-items: stretch;
     justify-content: flex-start;
     gap: 0;
-    min-height: 0;
-    overflow: auto;
+    flex-shrink: 0;
+    overflow: visible;
   }
 
   .nav.is-open .nav__links > a {
@@ -4206,6 +4208,8 @@ p {
     align-items: stretch;
     gap: 20px;
     flex-shrink: 0;
+    margin-top: auto;
+    padding-top: 8px;
   }
 
   .nav.is-open .nav__phone,
