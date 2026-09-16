@@ -44,6 +44,7 @@ export function SiteHeader({
   }, [open])
 
   return (
+    <>
     <header className={`site-header${open ? ' is-nav-open' : ''}`}>
       <div className="site-header__inner">
         <Link href="/" className="brand" onClick={() => setOpen(false)}>
@@ -142,5 +143,7 @@ export function SiteHeader({
         </div>
       </div>
     </header>
+    <div className="site-header__spacer" aria-hidden />
+    </>
   )
 }

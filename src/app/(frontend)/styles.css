@@ -874,10 +874,24 @@ p {
 
 @media (max-width: 760px) {
   .site-header,
-  .site-header.is-nav-open,
+  .site-header.is-nav-open {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 50;
+    overflow: hidden;
+  }
+
   .site-header__inner,
   .site-header.is-nav-open .site-header__inner {
     overflow: hidden;
+  }
+
+  .site-header__spacer {
+    display: block;
+    height: 88px;
   }
 }
 
@@ -994,6 +1008,10 @@ p {
 
 .site-header.is-nav-open .site-header__inner {
   overflow: hidden;
+}
+
+.site-header__spacer {
+  display: none;
 }
 
 .site-header__actions {
@@ -3895,12 +3913,6 @@ p {
   width: 100%;
 }
 
-.home-form.home-form--document .home-btn,
-.home-form.home-form--contacts .home-btn {
-  width: auto;
-  align-self: flex-start;
-}
-
 .home-form--contacts .home-form__upload-box {
   background: #fff;
 }
@@ -3957,6 +3969,46 @@ p {
 .home-form--proposal .home-btn {
   min-height: 44px;
   gap: 8px;
+}
+
+@media (max-width: 980px) {
+  .form {
+    gap: 0.45rem;
+    padding: 0.75rem;
+  }
+
+  .form input,
+  .form textarea,
+  .form select {
+    padding: 0.4rem 0.45rem;
+  }
+
+  .home-form--proposal {
+    gap: 12px;
+    padding: 20px;
+  }
+
+  .home-form--proposal input,
+  .home-form--proposal select,
+  .home-form--proposal textarea {
+    padding: 6px;
+  }
+
+  .home-form__upload-box {
+    padding: 12px;
+  }
+
+  .home-form__row {
+    gap: 8px;
+  }
+
+  .pubs-digest {
+    padding: 32px;
+  }
+
+  .pubs-digest__form input {
+    padding: 6px 12px;
+  }
 }
 
 .home-cta {
@@ -4228,7 +4280,7 @@ p {
   }
 
   .pubs-digest {
-    padding: 32px;
+    padding: 16px;
   }
 
   .pubs-digest__form input {
