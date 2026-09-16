@@ -17,6 +17,10 @@ export const metadata: Metadata = {
     'Экспертно-консалтинговая компания в области санитарно-эпидемиологической безопасности, экологии и оценки риска здоровью населения.',
 }
 
+export const viewport = {
+  themeColor: '#0f172a',
+}
+
 export default async function FrontendLayout({ children }: { children: React.ReactNode }) {
   const payload = await getPayloadClient()
 
