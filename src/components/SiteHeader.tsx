@@ -33,8 +33,14 @@ export function SiteHeader({
   const items = nav?.length ? nav : [...DEFAULT_NAV]
 
   useEffect(() => {
-    document.body.classList.toggle('nav-open', open)
-    return () => document.body.classList.remove('nav-open')
+    const html = document.documentElement
+    const { body } = document
+    html.classList.toggle('nav-open', open)
+    body.classList.toggle('nav-open', open)
+    return () => {
+      html.classList.remove('nav-open')
+      body.classList.remove('nav-open')
+    }
   }, [open])
 
   return (
@@ -64,12 +70,12 @@ export function SiteHeader({
           aria-label={open ? 'Закрыть меню' : 'Открыть меню'}
           onClick={() => setOpen((v) => !v)}
         >
-          <span className="mobile-nav-toggle__clip" aria-hidden>
-            <span className="mobile-nav-toggle__ring" />
-            <span className="mobile-nav-toggle__ring" />
-            <span className="mobile-nav-toggle__ring" />
-            <span className="mobile-nav-toggle__ring" />
+          <span className="mobile-nav-toggle__waves" aria-hidden>
+            <span className="mobile-nav-toggle__wave" />
+            <span className="mobile-nav-toggle__wave" />
+            <span className="mobile-nav-toggle__wave" />
           </span>
+          <span className="mobile-nav-toggle__ring" aria-hidden />
           <span className="mobile-nav-toggle__burger" aria-hidden>
             <span />
             <span />
