@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <!-- Shield -->
+  <path
+    d="M64 12
+       C53 19.5 38.5 23.5 24 23.5
+       V57
+       C24 82.5 41.5 100 64 110.5
+       C86.5 100 104 82.5 104 57
+       V23.5
+       C89.5 23.5 75 19.5 64 12Z"
+    stroke="#38BDF8"
+    stroke-width="4.25"
+    stroke-linejoin="round"
+  />
+
+  <!-- Flask -->
+  <path
+    d="M49 36.5 H79
+       M53.5 36.5 V47.5
+       L41 82.5
+       C39.4 86.6 42.4 91.5 47 91.5
+       H81
+       C85.6 91.5 88.6 86.6 87 82.5
+       L74.5 47.5 V36.5"
+    stroke="#38BDF8"
+    stroke-width="3.75"
+    stroke-linejoin="round"
+    stroke-linecap="round"
+  />
+
+  <!-- Liquid fill (no face-like bubble pattern) -->
+  <path
+    d="M44.8 74.5
+       H83.2
+       L85.4 81.2
+       C86.1 83.4 84.4 85.7 82 85.7
+       H46
+       C43.6 85.7 41.9 83.4 42.6 81.2
+       Z"
+    fill="#38BDF8"
+    fill-opacity="0.92"
+  />
+  <!-- Asymmetric bubbles so it doesn't look like a face -->
+  <circle cx="58" cy="79.5" r="1.7" fill="#0B1220"/>
+  <circle cx="67.5" cy="81.8" r="1.2" fill="#0B1220"/>
+  <circle cx="74" cy="78.6" r="1.4" fill="#0B1220"/>
+
+  <!-- Molecule upper-right, clearly separate -->
+  <g stroke="#38BDF8" stroke-width="2.1" stroke-linecap="round">
+    <line x1="86" y1="44" x2="96.5" y2="38"/>
+    <line x1="86" y1="44" x2="98" y2="49.5"/>
+    <line x1="86" y1="44" x2="79.5" y2="36.5"/>
+    <line x1="86" y1="44" x2="78" y2="52"/>
+  </g>
+  <circle cx="86" cy="44" r="3.1" fill="#38BDF8"/>
+  <circle cx="96.5" cy="38" r="2.2" fill="#38BDF8"/>
+  <circle cx="98" cy="49.5" r="2" fill="#38BDF8"/>
+  <circle cx="79.5" cy="36.5" r="1.9" fill="#38BDF8"/>
+  <circle cx="78" cy="52" r="1.9" fill="#38BDF8"/>
+</svg>
