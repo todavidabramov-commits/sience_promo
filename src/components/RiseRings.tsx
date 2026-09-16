@@ -1,13 +1,15 @@
 'use client'
 
-import { useEffect, useRef, useState, type ElementType, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+
+type RiseTag = 'div' | 'section' | 'article'
 
 export function RiseRings({
   as: Tag = 'div',
   className,
   children,
 }: {
-  as?: ElementType
+  as?: RiseTag
   className?: string
   children: ReactNode
 }) {

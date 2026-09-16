@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import { FieldError, NameInput, PhoneInput } from '@/components/MaskedFields'
-import { leadSchema, resolveYup, type LeadFormType, type LeadFormValues } from '@/lib/validation'
+import { leadSchema, yupFormResolver, type LeadFormType, type LeadFormValues } from '@/lib/validation'
 
 export function LeadForm({
   type = 'contact',
@@ -39,7 +39,7 @@ export function LeadForm({
     watch,
     formState: { errors, isSubmitting },
   } = useForm<LeadFormValues>({
-    resolver: async (values) => resolveYup(schema, values),
+    resolver: yupFormResolver<LeadFormValues>(schema),
     mode: 'onSubmit',
     reValidateMode: 'onBlur',
     defaultValues: {

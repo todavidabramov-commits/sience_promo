@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form'
 import { HighlightText } from '@/components/HighlightText'
 import { RiseRings } from '@/components/RiseRings'
 import { PUBLICATION_ARTICLES, PUBLICATION_FILTERS } from '@/lib/content'
-import { digestSchema, resolveYup, type DigestFormValues } from '@/lib/validation'
+import { digestSchema, yupFormResolver, type DigestFormValues } from '@/lib/validation'
 
 export function PubsDigest({ children }: { children: ReactNode }) {
   return (
@@ -136,7 +136,7 @@ export function DigestForm() {
     setError,
     formState: { errors, isSubmitting },
   } = useForm<DigestFormValues>({
-    resolver: async (values) => resolveYup(digestSchema, values),
+    resolver: yupFormResolver<DigestFormValues>(digestSchema),
     mode: 'onSubmit',
     reValidateMode: 'onChange',
     defaultValues: { email: '' },

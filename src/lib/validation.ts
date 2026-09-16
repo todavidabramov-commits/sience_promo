@@ -1,3 +1,4 @@
+import type { FieldValues, Resolver } from 'react-hook-form'
 import * as yup from 'yup'
 
 export type LeadFormType = 'contact' | 'proposal' | 'document'
@@ -70,7 +71,7 @@ function asFile(value: unknown): File | null {
 
 export function fileSchema(maxMb: number) {
   return yup
-    .mixed<File | null>()
+    .mixed<File>()
     .nullable()
     .transform((value) => asFile(value))
     .test('size', `Файл больше ${maxMb} МБ`, (file) => {
@@ -91,7 +92,7 @@ export function leadSchema(type: LeadFormType, maxFileMb = 50) {
     phone: phoneSchema,
     message: type === 'proposal' ? yup.string().default('') : messageSchema,
     serviceId: yup.string().default(''),
-    attachment: type === 'document' ? yup.mixed<File | null>().nullable() : fileSchema(maxFileMb),
+    attachment: type === 'document' ? yup.mixed<File>().nullable() : fileSchema(maxFileMb),
   })
 }
 
@@ -103,31 +104,26 @@ export type DigestFormValues = yup.InferType<typeof digestSchema>
 
 export type LeadFieldErrors = Partial<Record<keyof LeadFormValues | 'form', string>>
 
-type ResolverResult = {
-  values: LeadFormValues | Record<string, never>
-  errors: Record<string, { type: string; message: string }>
-}
-
-export function resolveYup<T extends Record<string, unknown>>(
-  schema: yup.AnyObjectSchema,
-  values: T,
-): Promise<ResolverResult> {
-  return schema
-    .validate(values, { abortEarly: false })
-    .then((data) => ({ values: data as LeadFormValues, errors: {} }))
-    .catch((error: unknown) => {
-      if (!(error instanceof yup.ValidationError)) {
-        return { values: {}, errors: { root: { type: 'validate', message: 'Проверьте поля' } } }
-      }
+export function yupFormResolver<T extends FieldValues>(schema: yup.AnyObjectSchema): Resolver<T> {
+  return (async (values) => {
+    try {
+      const data = (await schema.validate(values, { abortEarly: false })) as T
+      return { values: data, errors: {} }
+    } catch (error) {
       const errors: Record<string, { type: string; message: string }> = {}
-      for (const item of error.inner.length ? error.inner : [error]) {
-        const path = item.path || 'root'
-        if (!errors[path]) {
-          errors[path] = { type: item.type || 'validate', message: item.message }
+      if (error instanceof yup.ValidationError) {
+        for (const item of error.inner.length ? error.inner : [error]) {
+          const path = item.path || 'root'
+          if (!errors[path]) {
+            errors[path] = { type: item.type || 'validate', message: item.message }
+          }
         }
+      } else {
+        errors.root = { type: 'validate', message: 'Проверьте поля' }
       }
       return { values: {}, errors }
-    })
+    }
+  }) as Resolver<T>
 }
 
 export async function validateLeadFields(
