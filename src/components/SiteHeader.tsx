@@ -43,6 +43,15 @@ export function SiteHeader({
     }
   }, [open])
 
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 1281px)')
+    const closeIfDesktop = () => {
+      if (media.matches) setOpen(false)
+    }
+    media.addEventListener('change', closeIfDesktop)
+    return () => media.removeEventListener('change', closeIfDesktop)
+  }, [])
+
   return (
     <>
     <header className={`site-header${open ? ' is-nav-open' : ''}`}>
