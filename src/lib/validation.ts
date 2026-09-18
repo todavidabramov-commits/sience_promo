@@ -1,7 +1,11 @@
 import type { FieldValues, Resolver } from 'react-hook-form'
 import * as yup from 'yup'
 
+import { getMessages, type Messages } from '@/i18n/messages'
+import { fill } from '@/i18n/label'
+
 export type LeadFormType = 'contact' | 'proposal' | 'document'
+export type ValidationCopy = Messages['validation']
 
 export type LeadFormValues = {
   name: string
@@ -25,35 +29,44 @@ export function isCompleteRuPhone(value: string) {
   return digits.length === 11 && digits.startsWith('7')
 }
 
-const emailSchema = yup.string().trim().required('Укажите e-mail').email('Некорректный e-mail')
+function copy(v?: ValidationCopy): ValidationCopy {
+  return v || getMessages('ru').validation
+}
 
-const phoneSchema = yup
-  .string()
-  .trim()
-  .required('Укажите телефон')
-  .test('ru-phone', 'Неполный номер', (value) => isCompleteRuPhone(value || ''))
+function emailSchema(v?: ValidationCopy) {
+  const t = copy(v)
+  return yup.string().trim().required(t.emailRequired).email(t.emailInvalid)
+}
 
-const nameSchema = yup
-  .string()
-  .trim()
-  .required('Укажите имя')
-  .min(2, 'Слишком коротко')
-  .max(80, 'Слишком длинно')
-  .matches(NAME_MASK, 'Только буквы')
+function phoneSchema(v?: ValidationCopy) {
+  const t = copy(v)
+  return yup
+    .string()
+    .trim()
+    .required(t.phoneRequired)
+    .test('ru-phone', t.phoneIncomplete, (value) => isCompleteRuPhone(value || ''))
+}
 
-const companySchema = yup
-  .string()
-  .trim()
-  .required('Укажите организацию')
-  .min(2, 'Слишком коротко')
-  .max(160, 'Слишком длинно')
+function nameSchema(v?: ValidationCopy) {
+  const t = copy(v)
+  return yup
+    .string()
+    .trim()
+    .required(t.nameRequired)
+    .min(2, t.tooShort)
+    .max(80, t.tooLong)
+    .matches(NAME_MASK, t.lettersOnly)
+}
 
-const messageSchema = yup
-  .string()
-  .trim()
-  .required('Заполните поле')
-  .min(8, 'Слишком коротко')
-  .max(2000, 'Слишком длинно')
+function companySchema(v?: ValidationCopy) {
+  const t = copy(v)
+  return yup.string().trim().required(t.companyRequired).min(2, t.tooShort).max(160, t.tooLong)
+}
+
+function messageSchema(v?: ValidationCopy) {
+  const t = copy(v)
+  return yup.string().trim().required(t.fieldRequired).min(8, t.tooShort).max(2000, t.tooLong)
+}
 
 const ALLOWED_FILE = /\.(pdf|doc|docx|xls|xlsx|png|jpe?g|dwg)$/i
 
@@ -69,38 +82,41 @@ function asFile(value: unknown): File | null {
   return null
 }
 
-export function fileSchema(maxMb: number) {
+export function fileSchema(maxMb: number, v?: ValidationCopy) {
+  const t = copy(v)
   return yup
     .mixed<File>()
     .nullable()
     .transform((value) => asFile(value))
-    .test('size', `Файл больше ${maxMb} МБ`, (file) => {
+    .test('size', fill(t.fileTooBig, { mb: maxMb }), (file) => {
       if (!file) return true
       return file.size <= maxMb * 1024 * 1024
     })
-    .test('type', 'Недопустимый формат', (file) => {
+    .test('type', t.fileType, (file) => {
       if (!file) return true
       return ALLOWED_FILE.test(file.name)
     })
 }
 
-export function leadSchema(type: LeadFormType, maxFileMb = 50) {
+export function leadSchema(type: LeadFormType, maxFileMb = 50, v?: ValidationCopy) {
   return yup.object({
-    name: type === 'contact' ? nameSchema : yup.string().default(''),
-    company: type === 'proposal' ? companySchema : yup.string().default(''),
-    email: emailSchema,
-    phone: phoneSchema,
-    message: type === 'proposal' ? yup.string().default('') : messageSchema,
+    name: type === 'contact' ? nameSchema(v) : yup.string().default(''),
+    company: type === 'proposal' ? companySchema(v) : yup.string().default(''),
+    email: emailSchema(v),
+    phone: phoneSchema(v),
+    message: type === 'proposal' ? yup.string().default('') : messageSchema(v),
     serviceId: yup.string().default(''),
-    attachment: type === 'document' ? yup.mixed<File>().nullable() : fileSchema(maxFileMb),
+    attachment: type === 'document' ? yup.mixed<File>().nullable() : fileSchema(maxFileMb, v),
   })
 }
 
-export const digestSchema = yup.object({
-  email: emailSchema,
-})
+export function digestSchema(v?: ValidationCopy) {
+  return yup.object({
+    email: emailSchema(v),
+  })
+}
 
-export type DigestFormValues = yup.InferType<typeof digestSchema>
+export type DigestFormValues = { email: string }
 
 export type LeadFieldErrors = Partial<Record<keyof LeadFormValues | 'form', string>>
 
@@ -119,7 +135,7 @@ export function yupFormResolver<T extends FieldValues>(schema: yup.AnyObjectSche
           }
         }
       } else {
-        errors.root = { type: 'validate', message: 'Проверьте поля' }
+        errors.root = { type: 'validate', message: getMessages('ru').validation.checkFields }
       }
       return { values: {}, errors }
     }
@@ -131,7 +147,7 @@ export async function validateLeadFields(
   values: Record<string, string>,
 ): Promise<{ ok: true } | { ok: false; errors: LeadFieldErrors }> {
   try {
-    await leadSchema(type).validate(
+    await leadSchema(type, 50, copy()).validate(
       {
         name: values.name || '',
         company: values.company || '',

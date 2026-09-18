@@ -4,15 +4,24 @@ import Link from 'next/link'
 
 import { DigestForm, PubsDigest, PublicationsCatalog } from '@/components/PublicationsCatalog'
 import { Reveal, RevealHero } from '@/components/Reveal'
-import { FEATURED_PUBLICATION } from '@/lib/content'
+import { publicationFilters } from '@/cms/filters'
+import { getPublications } from '@/cms/queries'
+import { getLocale } from '@/i18n/get-locale'
+import { getMessages } from '@/i18n/messages'
 
-export const metadata: Metadata = {
-  title: 'Публикации',
-  description:
-    'Экспертные материалы, публикации и научные исследования центра СанЭпидЭксперт.',
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getMessages(await getLocale()).pubs
+  return { title: t.metaTitle, description: t.metaDescription }
 }
 
-export default function PublicationsPage() {
+export default async function PublicationsPage() {
+  const locale = await getLocale()
+  const t = getMessages(locale).pubs
+  const common = getMessages(locale).common
+  const publications = await getPublications(locale)
+  const featured = publications.find((item) => item.featured) || publications[0]
+  const articles = publications.filter((item) => item.showInCatalog)
+
   return (
     <>
       <section className="about-hero">
@@ -30,67 +39,66 @@ export default function PublicationsPage() {
         </div>
         <div className="home-wrap about-hero__content">
           <RevealHero className="about-hero__copy">
-            <nav className="about-crumbs" aria-label="Навигация">
-              <Link href="/">Главная</Link>
+            <nav className="about-crumbs" aria-label={common.crumbs}>
+              <Link href="/">{common.home}</Link>
               <span>/</span>
-              <span>Медиа-центр</span>
+              <span>{t.media}</span>
               <span>/</span>
-              <em>Публикации</em>
+              <em>{t.crumb}</em>
             </nav>
-            <span className="home-tag">Научный центр</span>
-            <h1>Экспертные материалы, публикации и научные исследования</h1>
-            <p>
-              Мы делимся результатами прикладных токсикологических исследований, математического
-              моделирования и инженерно-экологических изысканий, прошедших государственную
-              экспертизу.
-            </p>
+            <span className="home-tag">{t.tag}</span>
+            <h1>{t.title}</h1>
+            <p>{t.lead}</p>
           </RevealHero>
         </div>
       </section>
 
       <section className="home-section home-section--muted">
         <div className="home-wrap pubs-content">
-          <Reveal>
-            <h2 className="pubs-featured__title">Выделенный материал</h2>
-            <article className="pubs-featured">
-              <div className="pubs-featured__info">
-                <span className="home-tag">Особо актуально</span>
-                <h3>{FEATURED_PUBLICATION.title}</h3>
-                <p>{FEATURED_PUBLICATION.excerpt}</p>
-                <div className="pubs-featured__meta">
-                  <span className="pubs-featured__cat">{FEATURED_PUBLICATION.category}</span>
-                  <span>Читать время: {FEATURED_PUBLICATION.readTime}</span>
-                  <span>Опубликовано: {FEATURED_PUBLICATION.date}</span>
+          {featured ? (
+            <Reveal>
+              <h2 className="pubs-featured__title">{t.featured}</h2>
+              <article className="pubs-featured">
+                <div className="pubs-featured__info">
+                  <span className="home-tag">{t.featuredTag}</span>
+                  <h3>{featured.title}</h3>
+                  <p>{featured.excerpt}</p>
+                  <div className="pubs-featured__meta">
+                    <span className="pubs-featured__cat">{featured.category}</span>
+                    <span>
+                      {t.readTime} {featured.readTime}
+                    </span>
+                    <span>
+                      {t.published} {featured.date}
+                    </span>
+                  </div>
+                  <Link className="home-btn home-btn--primary" href={`/publikacii/${featured.slug}`}>
+                    {t.readFull}
+                    <Image src="/images/icons/arrow-right.svg" alt="" width={16} height={16} />
+                  </Link>
                 </div>
-                <Link className="home-btn home-btn--primary" href={`/publikacii/${FEATURED_PUBLICATION.slug}`}>
-                  Читать полностью
-                  <Image src="/images/icons/arrow-right.svg" alt="" width={16} height={16} />
-                </Link>
-              </div>
-              <div className="pubs-featured__media">
-                <Image
-                  src={FEATURED_PUBLICATION.image}
-                  alt="Карта молекулярной сложности"
-                  fill
-                  quality={100}
-                  sizes="(max-width: 980px) 100vw, 480px"
-                />
-              </div>
-            </article>
-          </Reveal>
+                <div className="pubs-featured__media">
+                  <Image
+                    src={featured.image}
+                    alt={t.featuredAlt}
+                    fill
+                    quality={100}
+                    sizes="(max-width: 980px) 100vw, 480px"
+                  />
+                </div>
+              </article>
+            </Reveal>
+          ) : null}
 
           <Reveal>
-            <PublicationsCatalog />
+            <PublicationsCatalog articles={articles} filters={publicationFilters(t)} />
           </Reveal>
 
           <Reveal>
             <PubsDigest>
               <div className="pubs-digest__copy">
-                <h2>Подпишитесь на профессиональный дайджест</h2>
-                <p>
-                  Регулярно отправляем актуальную информацию об изменении законодательства в сфере СЗЗ,
-                  токсикологии и гигиенических нормативов. Без спама.
-                </p>
+                <h2>{t.digestTitle}</h2>
+                <p>{t.digestLead}</p>
               </div>
               <DigestForm />
             </PubsDigest>

@@ -5,20 +5,19 @@ import { notFound } from 'next/navigation'
 
 import { LeadForm } from '@/components/LeadForm'
 import { Reveal, RevealHero } from '@/components/Reveal'
-import { DEFAULT_SERVICES, SERVICE_ICON_SRC } from '@/lib/content'
+import { getService, getServiceOptions } from '@/cms/queries'
+import { getLocale } from '@/i18n/get-locale'
+import { getMessages } from '@/i18n/messages'
+import { SERVICE_ICON_SRC } from '@/lib/content'
 
 type Props = { params: Promise<{ slug: string }> }
 
-type ServiceView = (typeof DEFAULT_SERVICES)[number]
-
-export function generateStaticParams() {
-  return DEFAULT_SERVICES.map((item) => ({ slug: item.slug }))
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const service = DEFAULT_SERVICES.find((item) => item.slug === slug)
-  if (!service) return { title: 'Услуга' }
+  const locale = await getLocale()
+  const t = getMessages(locale).services
+  const service = await getService(slug, locale)
+  if (!service) return { title: t.fallback }
   return {
     title: service.title,
     description: service.lead,
@@ -27,10 +26,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ServiceDetailPage({ params }: Props) {
   const { slug } = await params
-  const service = DEFAULT_SERVICES.find((item) => item.slug === slug) as ServiceView | undefined
+  const locale = await getLocale()
+  const t = getMessages(locale).services
+  const common = getMessages(locale).common
+  const [service, serviceOptions] = await Promise.all([
+    getService(slug, locale),
+    getServiceOptions(locale),
+  ])
   if (!service) notFound()
-
-  const serviceOptions = DEFAULT_SERVICES.map((item) => ({ id: item.slug, title: item.title }))
   const icon = SERVICE_ICON_SRC[service.icon] || SERVICE_ICON_SRC['shield-alert']
 
   return (
@@ -50,15 +53,15 @@ export default async function ServiceDetailPage({ params }: Props) {
         </div>
         <div className="home-wrap about-hero__content">
           <RevealHero className="service-hero">
-            <nav className="about-crumbs" aria-label="Навигация">
-              <Link href="/">Главная</Link>
+            <nav className="about-crumbs" aria-label={common.crumbs}>
+              <Link href="/">{common.home}</Link>
               <span>/</span>
-              <Link href="/uslugi">Услуги</Link>
+              <Link href="/uslugi">{t.crumb}</Link>
               <span>/</span>
               <em>{service.title}</em>
             </nav>
             <div className="about-hero__copy">
-              <span className="home-tag">Орган инспекции</span>
+              <span className="home-tag">{t.heroTag}</span>
               <h1>{service.title}</h1>
               <p>{service.lead}</p>
             </div>
@@ -78,8 +81,8 @@ export default async function ServiceDetailPage({ params }: Props) {
       <section className="home-section">
         <div className="home-wrap service-detail">
           <Reveal className="service-detail__block">
-            <span className="home-tag">Суть работы</span>
-            <h2>Как устроено направление</h2>
+            <span className="home-tag">{t.aboutTag}</span>
+            <h2>{t.aboutTitle}</h2>
             <div className="service-detail__about">
               {service.about.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
@@ -89,8 +92,8 @@ export default async function ServiceDetailPage({ params }: Props) {
           </Reveal>
 
           <Reveal className="service-detail__block">
-            <span className="home-tag">Состав работ</span>
-            <h2>Что входит в услугу</h2>
+            <span className="home-tag">{t.scopeTag}</span>
+            <h2>{t.scopeTitle}</h2>
             <ul className="service-detail__scope">
               {service.scope.map((item) => (
                 <li key={item}>
@@ -102,8 +105,8 @@ export default async function ServiceDetailPage({ params }: Props) {
           </Reveal>
 
           <Reveal className="service-detail__block service-detail__block--wide">
-            <span className="home-tag">Порядок работ</span>
-            <h2>Как идём от исходных данных к согласованию</h2>
+            <span className="home-tag">{t.stagesTag}</span>
+            <h2>{t.stagesTitle}</h2>
             <div className="service-detail__stages">
               {service.stages.map((stage, index) => (
                 <article className="service-detail__stage" key={stage.title}>
@@ -114,7 +117,7 @@ export default async function ServiceDetailPage({ params }: Props) {
               ))}
               <article className="service-detail__stage is-result">
                 <span>04</span>
-                <h3>Ожидаемый результат</h3>
+                <h3>{t.resultTitle}</h3>
                 <p>{service.result}</p>
               </article>
             </div>
@@ -126,15 +129,12 @@ export default async function ServiceDetailPage({ params }: Props) {
         <div className="home-wrap home-cta">
           <Reveal className="home-cta__copy">
             <div className="home-cta__intro">
-              <span className="home-tag">Запрос</span>
-              <h2>Рассчитаем состав и стоимость по этому направлению</h2>
-              <p>
-                Пришлите ГПЗУ, инвентаризацию, ТЗ или хотя бы описание площадки. Подготовим
-                технико-экономическое предложение в течение рабочего дня.
-              </p>
+              <span className="home-tag">{t.requestTag}</span>
+              <h2>{t.requestTitle}</h2>
+              <p>{t.requestLead}</p>
             </div>
             <Link className="home-btn home-btn--outline" href="/uslugi">
-              Все услуги
+              {t.all}
             </Link>
           </Reveal>
           <Reveal delay={0.1}>

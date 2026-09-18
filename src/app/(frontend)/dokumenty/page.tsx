@@ -6,19 +6,23 @@ import { CatalogSectionMark } from '@/components/CatalogSectionMark'
 import { DocumentsCatalog } from '@/components/DocumentsCatalog'
 import { LeadForm } from '@/components/LeadForm'
 import { Reveal, RevealHero } from '@/components/Reveal'
+import { documentFilters } from '@/cms/filters'
+import { getDocuments } from '@/cms/queries'
+import { getLocale } from '@/i18n/get-locale'
+import { getMessages } from '@/i18n/messages'
 
-export const metadata: Metadata = {
-  title: 'Документы',
-  description:
-    'Справочная база действующих санитарных норм, гигиенических нормативов и методик проведения экспертиз.',
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getMessages(await getLocale()).docs
+  return { title: t.metaTitle, description: t.metaDescription }
 }
 
-const DOC_CHECKS = [
-  'Предоставляем обоснованный письменный ответ экспертов Органа инспекции.',
-  'Опираемся на разъяснения Федеральной службы Роспотребнадзора.',
-] as const
+export default async function DocumentsPage() {
+  const locale = await getLocale()
+  const messages = getMessages(locale)
+  const t = messages.docs
+  const common = messages.common
+  const documents = (await getDocuments(locale)).filter((item) => item.showInCatalog)
 
-export default function DocumentsPage() {
   return (
     <>
       <section className="about-hero">
@@ -36,19 +40,16 @@ export default function DocumentsPage() {
         </div>
         <div className="home-wrap about-hero__content">
           <RevealHero className="about-hero__copy">
-            <nav className="about-crumbs" aria-label="Навигация">
-              <Link href="/">Главная</Link>
+            <nav className="about-crumbs" aria-label={common.crumbs}>
+              <Link href="/">{common.home}</Link>
               <span>/</span>
-              <span>Информационный центр</span>
+              <span>{t.info}</span>
               <span>/</span>
-              <em>Документы</em>
+              <em>{t.crumb}</em>
             </nav>
-            <span className="home-tag">Реестр и законы</span>
-            <h1>Регламентирующие нормативно-правовые акты и ГОСТы</h1>
-            <p>
-              Справочная база действующих санитарных норм, гигиенических нормативов и методик
-              проведения экспертиз, используемых при проектировании СЗЗ и расчете рисков.
-            </p>
+            <span className="home-tag">{t.tag}</span>
+            <h1>{t.title}</h1>
+            <p>{t.lead}</p>
           </RevealHero>
         </div>
       </section>
@@ -57,7 +58,7 @@ export default function DocumentsPage() {
         <CatalogSectionMark icon="/images/icons/file-text.svg" />
         <div className="home-wrap">
           <Reveal>
-            <DocumentsCatalog />
+            <DocumentsCatalog documents={documents} filters={documentFilters(t)} />
           </Reveal>
         </div>
       </section>
@@ -66,15 +67,12 @@ export default function DocumentsPage() {
         <div className="home-wrap home-cta">
           <Reveal className="home-cta__copy">
             <div className="home-cta__intro">
-              <span className="home-tag">Официальный запрос</span>
-              <h2>Запрос разъяснений по расчету рисков и СЗЗ</h2>
-              <p>
-                Если вы не нашли нужную гигиеническую методику или вам требуется расшифровка
-                законодательных изменений в рамках ПАТ — обратитесь к инспекторам центра.
-              </p>
+              <span className="home-tag">{t.requestTag}</span>
+              <h2>{t.requestTitle}</h2>
+              <p>{t.requestLead}</p>
             </div>
             <ul>
-              {DOC_CHECKS.map((item) => (
+              {t.checks.map((item) => (
                 <li key={item}>
                   <Image src="/images/icons/check.svg" alt="" width={16} height={16} />
                   <span>{item}</span>

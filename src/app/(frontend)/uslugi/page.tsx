@@ -5,22 +5,23 @@ import Link from 'next/link'
 import { CatalogSectionMark } from '@/components/CatalogSectionMark'
 import { LeadForm } from '@/components/LeadForm'
 import { Reveal, RevealHero, RevealItem, RevealStagger } from '@/components/Reveal'
-import { DEFAULT_SERVICES, SERVICE_ICON_SRC } from '@/lib/content'
+import { getServiceOptions, getServices } from '@/cms/queries'
+import { getLocale } from '@/i18n/get-locale'
+import { getMessages } from '@/i18n/messages'
+import { SERVICE_ICON_SRC } from '@/lib/content'
 
-export const metadata: Metadata = {
-  title: 'Услуги',
-  description:
-    'Полный спектр экспертных работ в области гигиены, токсикологии и санитарно-защитных зон.',
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getMessages(await getLocale()).services
+  return { title: t.metaTitle, description: t.metaDescription }
 }
 
-const RFP_CHECKS = [
-  'Детализированное ТКП с обоснованием стоимости',
-  'Полная конфиденциальность по соглашению NDA',
-  'Опыт согласования в Центральном аппарате Роспотребнадзора',
-] as const
-
-export default function ServicesPage() {
-  const serviceOptions = DEFAULT_SERVICES.map((s) => ({ id: s.slug, title: s.title }))
+export default async function ServicesPage() {
+  const locale = await getLocale()
+  const t = getMessages(locale).services
+  const [services, serviceOptions] = await Promise.all([
+    getServices(locale),
+    getServiceOptions(locale),
+  ])
 
   return (
     <>
@@ -39,12 +40,9 @@ export default function ServicesPage() {
         </div>
         <div className="home-wrap about-hero__content">
           <RevealHero className="about-hero__copy">
-            <span className="home-tag">Услуги центра</span>
-            <h1>Полный спектр экспертных работ в области гигиены, токсикологии и СЗЗ</h1>
-            <p>
-              Оказываем высокотехнологичные инжиниринговые и консалтинговые услуги для девелопмента,
-              авиации и промышленности. Гарантируем легитимность каждого этапа разработки.
-            </p>
+            <span className="home-tag">{t.tag}</span>
+            <h1>{t.title}</h1>
+            <p>{t.lead}</p>
           </RevealHero>
         </div>
       </section>
@@ -53,16 +51,13 @@ export default function ServicesPage() {
         <CatalogSectionMark icon="/images/icons/layers.svg" />
         <div className="home-wrap">
           <Reveal className="home-section__head">
-            <span className="home-tag">Каталог услуг</span>
-            <h2>9 ключевых направлений деятельности Органа Инспекции</h2>
-            <p className="about-section-lead">
-              Мы не предлагаем стандартные шаблоны. Каждое направление обеспечивается
-              специализированной группой инженеров-акустиков, токсикологов и врачей по общей гигиене.
-            </p>
+            <span className="home-tag">{t.catalogTag}</span>
+            <h2>{t.catalogTitle}</h2>
+            <p className="about-section-lead">{t.catalogLead}</p>
           </Reveal>
 
           <RevealStagger className="services-catalog" stagger={0.06}>
-            {DEFAULT_SERVICES.map((service, index) => {
+            {services.map((service, index) => {
               const icon = SERVICE_ICON_SRC[service.icon] || SERVICE_ICON_SRC['shield-alert']
               const num = String(index + 1).padStart(2, '0')
               return (
@@ -77,7 +72,7 @@ export default function ServicesPage() {
                     <h3>{service.title}</h3>
                     <p>{service.summary}</p>
                     <div className="services-card__result">
-                      <em>Ожидаемый результат:</em>
+                      <em>{t.expected}</em>
                       <span>{service.result}</span>
                     </div>
                   </Link>
@@ -92,15 +87,12 @@ export default function ServicesPage() {
         <div className="home-wrap home-cta">
           <Reveal className="home-cta__copy">
             <div className="home-cta__intro">
-              <span className="home-tag">Калькуляция</span>
-              <h2>Оценка стоимости проектирования и экспертизы за 1 рабочий день</h2>
-              <p>
-                Отправьте имеющиеся чертежи, градостроительные планы или техническое задание. Мы
-                детально рассчитаем бюджет без скрытых платежей.
-              </p>
+              <span className="home-tag">{t.calcTag}</span>
+              <h2>{t.calcTitle}</h2>
+              <p>{t.calcLead}</p>
             </div>
             <ul>
-              {RFP_CHECKS.map((item) => (
+              {t.checks.map((item) => (
                 <li key={item}>
                   <Image src="/images/icons/check.svg" alt="" width={16} height={16} />
                   <span>{item}</span>

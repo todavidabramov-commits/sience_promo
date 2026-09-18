@@ -1,10 +1,12 @@
 import type { CollectionConfig } from 'payload'
 
+import { loc } from '../i18n/label'
+
 export const Media: CollectionConfig = {
   slug: 'media',
   labels: {
-    singular: 'Файл',
-    plural: 'Медиатека',
+    singular: loc('Файл', 'File'),
+    plural: loc('Медиатека', 'Media'),
   },
   access: {
     read: () => true,
@@ -13,7 +15,7 @@ export const Media: CollectionConfig = {
     {
       name: 'alt',
       type: 'text',
-      label: 'Подпись (alt)',
+      label: loc('Подпись (alt)', 'Alt text'),
     },
   ],
   upload: {

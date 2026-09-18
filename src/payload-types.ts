@@ -100,7 +100,7 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: null;
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('ru' | 'en') | ('ru' | 'en')[];
   globals: {
     'site-settings': SiteSetting;
     header: Header;
@@ -111,7 +111,7 @@ export interface Config {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
   };
-  locale: null;
+  locale: 'ru' | 'en';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -191,9 +191,11 @@ export interface Service {
   id: number;
   title: string;
   /**
-   * Формируется автоматически из названия, можно изменить вручную.
+   * Формируется автоматически из названия, можно изменить вручную. / Generated from the title automatically; you can edit it manually.
    */
   slug: string;
+  summary: string;
+  lead?: string | null;
   category?:
     | (
         | 'health-risk'
@@ -207,23 +209,46 @@ export interface Service {
         | 'research'
       )
     | null;
-  summary: string;
-  icon?: ('risk' | 'zone' | 'expertise' | 'air' | 'noise' | 'research') | null;
-  content?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  icon?:
+    | (
+        | 'risk'
+        | 'zone'
+        | 'expertise'
+        | 'air'
+        | 'noise'
+        | 'research'
+        | 'shield-alert'
+        | 'map-pin'
+        | 'award'
+        | 'activity'
+        | 'wind'
+        | 'volume'
+        | 'plane'
+        | 'microscope'
+        | 'file-text'
+      )
+    | null;
+  overview?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  scope?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  stages?:
+    | {
+        title: string;
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  audience?: string | null;
+  result?: string | null;
   deliverables?:
     | {
         item: string;
@@ -247,14 +272,26 @@ export interface Project {
   id: number;
   title: string;
   /**
-   * Формируется автоматически из названия, можно изменить вручную.
+   * Если пусто, на странице берётся название карточки. / If empty, the card title is used on the page.
+   */
+  headline?: string | null;
+  /**
+   * Формируется автоматически из названия, можно изменить вручную. / Generated from the title automatically; you can edit it manually.
    */
   slug: string;
   summary: string;
   clientType?: ('industry' | 'oilgas' | 'airport' | 'development' | 'infra' | 'design') | null;
+  clientLabel?: string | null;
+  sector?: string | null;
+  section?: ('aviation' | 'oilgas' | 'urban') | null;
+  task?: string | null;
+  approach?: string | null;
+  result?: string | null;
+  /**
+   * /images/cases/case-1-hq.png
+   */
+  image?: string | null;
   cover?: (number | null) | Media;
-  services?: (number | Service)[] | null;
-  year?: number | null;
   content?: {
     root: {
       type: string;
@@ -271,6 +308,9 @@ export interface Project {
     [k: string]: unknown;
   } | null;
   featured?: boolean | null;
+  showOnHome?: boolean | null;
+  year?: number | null;
+  order?: number | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -287,11 +327,12 @@ export interface Expert {
   id: number;
   name: string;
   /**
-   * Формируется автоматически из названия, можно изменить вручную.
+   * Формируется автоматически из названия, можно изменить вручную. / Generated from the title automatically; you can edit it manually.
    */
   slug: string;
-  role: string;
-  photo?: (number | null) | Media;
+  role?: string | null;
+  title?: string | null;
+  credentials?: string | null;
   bio?: string | null;
   competencies?:
     | {
@@ -299,6 +340,15 @@ export interface Expert {
         id?: string | null;
       }[]
     | null;
+  tags?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  image?: string | null;
+  photo?: (number | null) | Media;
+  showOnHome?: boolean | null;
   order?: number | null;
   updatedAt: string;
   createdAt: string;
@@ -311,14 +361,30 @@ export interface Publication {
   id: number;
   title: string;
   /**
-   * Формируется автоматически из названия, можно изменить вручную.
+   * Формируется автоматически из названия, можно изменить вручную. / Generated from the title automatically; you can edit it manually.
    */
   slug: string;
   excerpt: string;
-  cover?: (number | null) | Media;
   category?: ('science' | 'methodology' | 'regulation' | 'cases') | null;
-  publishedAt: string;
-  authors?: (number | Expert)[] | null;
+  categoryLabel?: string | null;
+  dateLabel?: string | null;
+  readTime?: string | null;
+  section?: ('science' | 'risks' | 'urban' | 'air') | null;
+  image?: string | null;
+  cover?: (number | null) | Media;
+  body?:
+    | {
+        blockType: 'p' | 'h2' | 'ul';
+        text?: string | null;
+        items?:
+          | {
+              item: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
   content?: {
     root: {
       type: string;
@@ -335,6 +401,10 @@ export interface Publication {
     [k: string]: unknown;
   } | null;
   featured?: boolean | null;
+  showInCatalog?: boolean | null;
+  showOnHome?: boolean | null;
+  publishedAt?: string | null;
+  order?: number | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -349,11 +419,20 @@ export interface Publication {
  */
 export interface Document {
   id: number;
+  code: string;
   title: string;
-  description?: string | null;
+  excerpt?: string | null;
   category?: ('licenses' | 'certificates' | 'methods' | 'regulations' | 'other') | null;
-  file: number | Media;
-  publishedAt?: string | null;
+  section?: ('federal' | 'sanpin' | 'methods' | 'accreditation') | null;
+  /**
+   * For example: PDF, 1.2 MB
+   */
+  fileLabel?: string | null;
+  homeMeta?: string | null;
+  file?: (number | null) | Media;
+  showInCatalog?: boolean | null;
+  showOnHome?: boolean | null;
+  order?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -365,7 +444,7 @@ export interface Page {
   id: number;
   title: string;
   /**
-   * Формируется автоматически из названия, можно изменить вручную.
+   * Формируется автоматически из названия, можно изменить вручную. / Generated from the title automatically; you can edit it manually.
    */
   slug: string;
   hero?: {
@@ -563,10 +642,31 @@ export interface MediaSelect<T extends boolean = true> {
 export interface ServicesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
-  category?: T;
   summary?: T;
+  lead?: T;
+  category?: T;
   icon?: T;
-  content?: T;
+  overview?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  scope?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  stages?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        id?: T;
+      };
+  audience?: T;
+  result?: T;
   deliverables?:
     | T
     | {
@@ -590,14 +690,23 @@ export interface ServicesSelect<T extends boolean = true> {
  */
 export interface ProjectsSelect<T extends boolean = true> {
   title?: T;
+  headline?: T;
   slug?: T;
   summary?: T;
   clientType?: T;
+  clientLabel?: T;
+  sector?: T;
+  section?: T;
+  task?: T;
+  approach?: T;
+  result?: T;
+  image?: T;
   cover?: T;
-  services?: T;
-  year?: T;
   content?: T;
   featured?: T;
+  showOnHome?: T;
+  year?: T;
+  order?: T;
   meta?:
     | T
     | {
@@ -616,7 +725,8 @@ export interface ExpertsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   role?: T;
-  photo?: T;
+  title?: T;
+  credentials?: T;
   bio?: T;
   competencies?:
     | T
@@ -624,6 +734,15 @@ export interface ExpertsSelect<T extends boolean = true> {
         item?: T;
         id?: T;
       };
+  tags?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  image?: T;
+  photo?: T;
+  showOnHome?: T;
   order?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -636,12 +755,32 @@ export interface PublicationsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   excerpt?: T;
-  cover?: T;
   category?: T;
-  publishedAt?: T;
-  authors?: T;
+  categoryLabel?: T;
+  dateLabel?: T;
+  readTime?: T;
+  section?: T;
+  image?: T;
+  cover?: T;
+  body?:
+    | T
+    | {
+        blockType?: T;
+        text?: T;
+        items?:
+          | T
+          | {
+              item?: T;
+              id?: T;
+            };
+        id?: T;
+      };
   content?: T;
   featured?: T;
+  showInCatalog?: T;
+  showOnHome?: T;
+  publishedAt?: T;
+  order?: T;
   meta?:
     | T
     | {
@@ -657,11 +796,17 @@ export interface PublicationsSelect<T extends boolean = true> {
  * via the `definition` "documents_select".
  */
 export interface DocumentsSelect<T extends boolean = true> {
+  code?: T;
   title?: T;
-  description?: T;
+  excerpt?: T;
   category?: T;
+  section?: T;
+  fileLabel?: T;
+  homeMeta?: T;
   file?: T;
-  publishedAt?: T;
+  showInCatalog?: T;
+  showOnHome?: T;
+  order?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -758,6 +903,33 @@ export interface SiteSetting {
   phone?: string | null;
   email?: string | null;
   address?: string | null;
+  officeTitle?: string | null;
+  hours?: string | null;
+  officeNote?: string | null;
+  lat?: number | null;
+  lon?: number | null;
+  channels?:
+    | {
+        title: string;
+        phone: string;
+        email: string;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  contactDocs?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  requisites?:
+    | {
+        label: string;
+        value?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   analytics?: {
     ymId?: string | null;
     gaId?: string | null;
@@ -816,6 +988,33 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   phone?: T;
   email?: T;
   address?: T;
+  officeTitle?: T;
+  hours?: T;
+  officeNote?: T;
+  lat?: T;
+  lon?: T;
+  channels?:
+    | T
+    | {
+        title?: T;
+        phone?: T;
+        email?: T;
+        text?: T;
+        id?: T;
+      };
+  contactDocs?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  requisites?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        id?: T;
+      };
   analytics?:
     | T
     | {

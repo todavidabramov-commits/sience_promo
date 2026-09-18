@@ -4,78 +4,20 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { Reveal, RevealHero } from '@/components/Reveal'
-import { DEFAULT_PUBLICATIONS, FEATURED_PUBLICATION, PUBLICATION_ARTICLES } from '@/lib/content'
-import { getPayloadClient } from '@/lib/payload'
-import {
-  getPublicationBody,
-  lexicalToBlocks,
-  type ArticleBlock,
-} from '@/lib/publication-bodies'
+import { getPublication } from '@/cms/queries'
+import { getLocale } from '@/i18n/get-locale'
+import { getMessages } from '@/i18n/messages'
+import type { ArticleBlock } from '@/lib/publication-bodies'
 
 type Props = { params: Promise<{ slug: string }> }
 
-type PublicationView = {
-  title: string
-  excerpt: string
-  category: string
-  date?: string
-  readTime?: string
-  body: ArticleBlock[]
-}
-
-const LOCAL_PUBLICATIONS = [
-  FEATURED_PUBLICATION,
-  ...PUBLICATION_ARTICLES,
-  ...DEFAULT_PUBLICATIONS,
-] as const
-
-export function generateStaticParams() {
-  return LOCAL_PUBLICATIONS.map((item) => ({ slug: item.slug }))
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const pub = await findPublication(slug)
-  if (!pub) return { title: 'Публикация' }
+  const locale = await getLocale()
+  const t = getMessages(locale).pubs
+  const pub = await getPublication(slug, locale)
+  if (!pub) return { title: t.fallback }
   return { title: pub.title, description: pub.excerpt }
-}
-
-function localPublication(slug: string) {
-  return LOCAL_PUBLICATIONS.find((item) => item.slug === slug) || null
-}
-
-async function findPublication(slug: string): Promise<PublicationView | null> {
-  const local = localPublication(slug)
-  const payload = await getPayloadClient()
-  const fromCms = await payload
-    .find({ collection: 'publications', where: { slug: { equals: slug } }, limit: 1 })
-    .catch(() => null)
-
-  const cms = fromCms?.docs?.[0]
-  const cmsBody = cms ? lexicalToBlocks(cms.content) : []
-  const body = cmsBody.length ? cmsBody : getPublicationBody(slug) || []
-
-  if (cms) {
-    return {
-      title: cms.title,
-      excerpt: cms.excerpt,
-      category: local && 'category' in local ? local.category : cms.category || '',
-      date: local && 'date' in local ? local.date : undefined,
-      readTime: local && 'readTime' in local ? local.readTime : undefined,
-      body,
-    }
-  }
-
-  if (!local) return null
-
-  return {
-    title: local.title,
-    excerpt: local.excerpt,
-    category: local.category,
-    date: 'date' in local ? local.date : undefined,
-    readTime: 'readTime' in local ? local.readTime : undefined,
-    body,
-  }
 }
 
 function ArticleBlocks({ blocks }: { blocks: ArticleBlock[] }) {
@@ -100,7 +42,10 @@ function ArticleBlocks({ blocks }: { blocks: ArticleBlock[] }) {
 
 export default async function PublicationDetailPage({ params }: Props) {
   const { slug } = await params
-  const pub = await findPublication(slug)
+  const locale = await getLocale()
+  const t = getMessages(locale).pubs
+  const common = getMessages(locale).common
+  const pub = await getPublication(slug, locale)
   if (!pub) notFound()
 
   return (
@@ -120,14 +65,14 @@ export default async function PublicationDetailPage({ params }: Props) {
         </div>
         <div className="home-wrap about-hero__content">
           <RevealHero className="about-hero__copy">
-            <nav className="about-crumbs" aria-label="Навигация">
-              <Link href="/">Главная</Link>
+            <nav className="about-crumbs" aria-label={common.crumbs}>
+              <Link href="/">{common.home}</Link>
               <span>/</span>
-              <Link href="/publikacii">Публикации</Link>
+              <Link href="/publikacii">{t.crumb}</Link>
               <span>/</span>
-              <em>{pub.category || 'Статья'}</em>
+              <em>{pub.category || common.articleFallback}</em>
             </nav>
-            <span className="home-tag">{pub.category || 'Публикация'}</span>
+            <span className="home-tag">{pub.category || t.fallback}</span>
             <div className="about-hero__title">
               <h1>{pub.title}</h1>
               {pub.date || pub.readTime ? (
@@ -148,10 +93,10 @@ export default async function PublicationDetailPage({ params }: Props) {
             {pub.body.length ? (
               <ArticleBlocks blocks={pub.body} />
             ) : (
-              <p>Текст материала готовится к публикации.</p>
+              <p>{t.preparing}</p>
             )}
             <Link className="home-btn home-btn--outline pubs-article__back" href="/publikacii">
-              Все публикации
+              {t.all}
             </Link>
           </Reveal>
         </div>

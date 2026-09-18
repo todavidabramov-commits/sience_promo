@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     if (type === 'digest') {
       try {
-        await digestSchema.validate({ email }, { abortEarly: false })
+        await digestSchema().validate({ email }, { abortEarly: false })
       } catch (error) {
         const messageText = error instanceof Error ? error.message : 'Проверьте e-mail'
         return NextResponse.json({ error: messageText }, { status: 400 })

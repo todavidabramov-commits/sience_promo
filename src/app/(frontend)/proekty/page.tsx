@@ -3,14 +3,21 @@ import Image from 'next/image'
 
 import { ProjectsCatalog } from '@/components/ProjectsCatalog'
 import { Reveal, RevealHero } from '@/components/Reveal'
+import { projectFilters } from '@/cms/filters'
+import { getProjects } from '@/cms/queries'
+import { getLocale } from '@/i18n/get-locale'
+import { getMessages } from '@/i18n/messages'
 
-export const metadata: Metadata = {
-  title: 'Проекты',
-  description:
-    'Сложнейшие инженерно-экологические кейсы, успешно прошедшие Главгосэкспертизу.',
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getMessages(await getLocale()).projects
+  return { title: t.metaTitle, description: t.metaDescription }
 }
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const locale = await getLocale()
+  const t = getMessages(locale).projects
+  const cases = await getProjects(locale)
+
   return (
     <>
       <section className="about-hero">
@@ -28,12 +35,9 @@ export default function ProjectsPage() {
         </div>
         <div className="home-wrap about-hero__content">
           <RevealHero className="about-hero__copy">
-            <span className="home-tag">Наши проекты</span>
-            <h1>Сложнейшие инженерно-экологические кейсы, успешно прошедшие Главгосэкспертизу</h1>
-            <p>
-              Мы не скрываем результаты своей работы. Здесь собраны реальные примеры проектирования
-              СЗЗ и оценки рисков для градообразующих предприятий и инфраструктурных узлов.
-            </p>
+            <span className="home-tag">{t.tag}</span>
+            <h1>{t.title}</h1>
+            <p>{t.lead}</p>
           </RevealHero>
         </div>
       </section>
@@ -41,7 +45,7 @@ export default function ProjectsPage() {
       <section className="home-section home-section--muted">
         <div className="home-wrap">
           <Reveal>
-            <ProjectsCatalog />
+            <ProjectsCatalog cases={cases} filters={projectFilters(t)} />
           </Reveal>
         </div>
       </section>

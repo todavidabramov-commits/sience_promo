@@ -1,8 +1,10 @@
 import type { GlobalConfig } from 'payload'
 
+import { loc } from '../i18n/label'
+
 export const Footer: GlobalConfig = {
   slug: 'footer',
-  label: 'Подвал',
+  label: loc('Подвал', 'Footer'),
   access: {
     read: () => true,
   },
@@ -10,21 +12,22 @@ export const Footer: GlobalConfig = {
     {
       name: 'columns',
       type: 'array',
-      label: 'Колонки',
+      label: loc('Колонки', 'Columns'),
       fields: [
         {
           name: 'title',
           type: 'text',
           required: true,
-          label: 'Заголовок колонки',
+          localized: true,
+          label: loc('Заголовок колонки', 'Column title'),
         },
         {
           name: 'links',
           type: 'array',
-          label: 'Ссылки',
+          label: loc('Ссылки', 'Links'),
           fields: [
-            { name: 'label', type: 'text', required: true, label: 'Название' },
-            { name: 'href', type: 'text', required: true, label: 'Ссылка' },
+            { name: 'label', type: 'text', required: true, localized: true, label: loc('Название', 'Label') },
+            { name: 'href', type: 'text', required: true, label: loc('Ссылка', 'Link') },
           ],
         },
       ],
@@ -32,7 +35,8 @@ export const Footer: GlobalConfig = {
     {
       name: 'legal',
       type: 'textarea',
-      label: 'Юридическая информация',
+      localized: true,
+      label: loc('Юридическая информация', 'Legal information'),
     },
   ],
 }

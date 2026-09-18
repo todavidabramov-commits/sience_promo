@@ -1,5 +1,7 @@
 import type { Field } from 'payload'
 
+import { loc } from '../i18n/label'
+
 export const seoFields: Field = {
   name: 'meta',
   type: 'group',
@@ -8,18 +10,20 @@ export const seoFields: Field = {
     {
       name: 'title',
       type: 'text',
-      label: 'Мета-заголовок',
+      localized: true,
+      label: loc('Мета-заголовок', 'Meta title'),
     },
     {
       name: 'description',
       type: 'textarea',
-      label: 'Мета-описание',
+      localized: true,
+      label: loc('Мета-описание', 'Meta description'),
     },
     {
       name: 'image',
       type: 'upload',
       relationTo: 'media',
-      label: 'Изображение для соцсетей',
+      label: loc('Изображение для соцсетей', 'Social image'),
     },
   ],
 }

@@ -2,16 +2,17 @@ import type { CollectionConfig } from 'payload'
 
 import { seoFields } from '../fields/seo'
 import { slugField } from '../fields/slug'
+import { loc } from '../i18n/label'
 
 export const Publications: CollectionConfig = {
   slug: 'publications',
   labels: {
-    singular: 'Публикация',
-    plural: 'Публикации',
+    singular: loc('Публикация', 'Publication'),
+    plural: loc('Публикации', 'Publications'),
   },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'publishedAt', 'updatedAt'],
+    defaultColumns: ['title', 'section', 'featured', 'updatedAt'],
   },
   access: {
     read: () => true,
@@ -21,59 +22,154 @@ export const Publications: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
-      label: 'Заголовок',
+      localized: true,
+      label: loc('Заголовок', 'Title'),
     },
     slugField(),
     {
       name: 'excerpt',
       type: 'textarea',
       required: true,
-      label: 'Анонс',
+      localized: true,
+      label: loc('Анонс', 'Excerpt'),
+    },
+    {
+      name: 'category',
+      type: 'select',
+      label: loc('Категория (служебная)', 'Category (internal)'),
+      admin: { position: 'sidebar' },
+      options: [
+        { label: loc('Наука', 'Science'), value: 'science' },
+        { label: loc('Методология', 'Methodology'), value: 'methodology' },
+        { label: loc('Регуляторика', 'Regulation'), value: 'regulation' },
+        { label: loc('Кейсы', 'Cases'), value: 'cases' },
+      ],
+    },
+    {
+      name: 'categoryLabel',
+      type: 'text',
+      localized: true,
+      label: loc('Категория на сайте', 'Category on the site'),
+    },
+    {
+      name: 'dateLabel',
+      type: 'text',
+      localized: true,
+      label: loc('Дата текстом', 'Date label'),
+    },
+    {
+      name: 'readTime',
+      type: 'text',
+      localized: true,
+      label: loc('Время чтения', 'Reading time'),
+    },
+    {
+      name: 'section',
+      type: 'select',
+      label: loc('Раздел фильтра', 'Filter section'),
+      options: [
+        { label: loc('Научные статьи', 'Scientific papers'), value: 'science' },
+        { label: loc('Исследования рисков', 'Risk research'), value: 'risks' },
+        { label: loc('Аналитика застройки', 'Development analytics'), value: 'urban' },
+        { label: loc('Охрана атмосферного воздуха', 'Ambient air protection'), value: 'air' },
+      ],
+    },
+    {
+      name: 'image',
+      type: 'text',
+      label: loc('Путь к обложке', 'Cover path'),
     },
     {
       name: 'cover',
       type: 'upload',
       relationTo: 'media',
-      label: 'Обложка',
+      label: loc('Обложка', 'Cover'),
     },
     {
-      name: 'category',
-      type: 'select',
-      label: 'Категория',
-      options: [
-        { label: 'Наука', value: 'science' },
-        { label: 'Методология', value: 'methodology' },
-        { label: 'Регуляторика', value: 'regulation' },
-        { label: 'Кейсы', value: 'cases' },
+      name: 'body',
+      type: 'array',
+      localized: true,
+      label: loc('Текст статьи', 'Article body'),
+      fields: [
+        {
+          name: 'blockType',
+          type: 'select',
+          required: true,
+          defaultValue: 'p',
+          label: loc('Тип блока', 'Block type'),
+          options: [
+            { label: loc('Абзац', 'Paragraph'), value: 'p' },
+            { label: loc('Подзаголовок', 'Heading'), value: 'h2' },
+            { label: loc('Список', 'List'), value: 'ul' },
+          ],
+        },
+        {
+          name: 'text',
+          type: 'textarea',
+          label: loc('Текст', 'Text'),
+          admin: {
+            condition: (_, siblingData) => siblingData?.blockType !== 'ul',
+          },
+        },
+        {
+          name: 'items',
+          type: 'array',
+          label: loc('Пункты списка', 'List items'),
+          admin: {
+            condition: (_, siblingData) => siblingData?.blockType === 'ul',
+          },
+          fields: [
+            {
+              name: 'item',
+              type: 'text',
+              required: true,
+              label: loc('Пункт', 'Item'),
+            },
+          ],
+        },
       ],
+    },
+    {
+      name: 'content',
+      type: 'richText',
+      label: loc('Текст (служебное)', 'Body (legacy)'),
+      admin: { hidden: true },
+    },
+    {
+      name: 'featured',
+      type: 'checkbox',
+      label: loc('Выделенный материал', 'Featured'),
+      defaultValue: false,
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'showInCatalog',
+      type: 'checkbox',
+      label: loc('В каталоге публикаций', 'Show in catalog'),
+      defaultValue: true,
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'showOnHome',
+      type: 'checkbox',
+      label: loc('На главной', 'Show on home'),
+      defaultValue: false,
+      admin: { position: 'sidebar' },
     },
     {
       name: 'publishedAt',
       type: 'date',
-      required: true,
-      label: 'Дата публикации',
+      label: loc('Дата публикации', 'Publication date'),
       admin: {
         date: { pickerAppearance: 'dayOnly' },
         position: 'sidebar',
       },
     },
     {
-      name: 'authors',
-      type: 'relationship',
-      relationTo: 'experts',
-      hasMany: true,
-      label: 'Авторы',
-    },
-    {
-      name: 'content',
-      type: 'richText',
-      label: 'Текст',
-    },
-    {
-      name: 'featured',
-      type: 'checkbox',
-      label: 'Избранная',
-      defaultValue: false,
+      name: 'order',
+      type: 'number',
+      label: loc('Порядок', 'Order'),
+      defaultValue: 0,
       admin: { position: 'sidebar' },
     },
     seoFields,

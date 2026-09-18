@@ -182,20 +182,20 @@ function Molecule({
     if (!group.current) return
 
     const damp = 1 - Math.exp(-delta * 6)
-    const targetTiltX = hovering ? pointer.current.y * 0.18 : 0
-    const targetTiltY = hovering ? pointer.current.x * 0.22 : 0
+    const targetTiltX = hovering ? pointer.current.y * 0.1 : 0
+    const targetTiltY = hovering ? pointer.current.x * 0.12 : 0
     tilt.current.x += (targetTiltX - tilt.current.x) * damp
     tilt.current.y += (targetTiltY - tilt.current.y) * damp
 
-    group.current.rotation.y += delta * 0.2
+    group.current.rotation.y += delta * 0.16
     group.current.rotation.x =
-      Math.sin(state.clock.elapsedTime * 0.28) * 0.08 + tilt.current.x
+      Math.sin(state.clock.elapsedTime * 0.28) * 0.05 + tilt.current.x
     group.current.rotation.z =
-      Math.cos(state.clock.elapsedTime * 0.2) * 0.04 + tilt.current.y * 0.2
+      Math.cos(state.clock.elapsedTime * 0.2) * 0.025 + tilt.current.y * 0.12
   })
 
   return (
-    <group ref={group} scale={0.5} position={[0, 0.05, 0]}>
+    <group ref={group} scale={0.38} position={[0, 0.02, 0]}>
       <group position={[-center.x, -center.y, -center.z]}>
         {BONDS.map(([i, j], key) => (
           <BondMesh key={key} a={atoms[i].vec} b={atoms[j].vec} />
@@ -353,7 +353,7 @@ export function HeroMolecule() {
       <Canvas
         dpr={[1, 2]}
         frameloop={active ? 'always' : 'demand'}
-        camera={{ position: [0, 0.15, 8.8], fov: 28, near: 0.1, far: 40 }}
+        camera={{ position: [0, 0.1, 9.6], fov: 26, near: 0.1, far: 40 }}
         gl={{
           antialias: true,
           alpha: true,

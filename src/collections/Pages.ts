@@ -2,12 +2,13 @@ import type { CollectionConfig } from 'payload'
 
 import { seoFields } from '../fields/seo'
 import { slugField } from '../fields/slug'
+import { loc } from '../i18n/label'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
   labels: {
-    singular: 'Страница',
-    plural: 'Страницы',
+    singular: loc('Страница', 'Page'),
+    plural: loc('Страницы', 'Pages'),
   },
   admin: {
     useAsTitle: 'title',
@@ -21,37 +22,41 @@ export const Pages: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
-      label: 'Заголовок',
+      localized: true,
+      label: loc('Заголовок', 'Title'),
     },
     slugField(),
     {
       name: 'hero',
       type: 'group',
-      label: 'Первый экран',
+      label: loc('Первый экран', 'Hero'),
       fields: [
         {
           name: 'headline',
           type: 'text',
-          label: 'Заголовок секции',
+          localized: true,
+          label: loc('Заголовок секции', 'Section headline'),
         },
         {
           name: 'text',
           type: 'textarea',
-          label: 'Подзаголовок',
+          localized: true,
+          label: loc('Подзаголовок', 'Subheadline'),
         },
       ],
     },
     {
       name: 'content',
       type: 'richText',
-      label: 'Контент',
+      localized: true,
+      label: loc('Контент', 'Content'),
     },
     {
       name: 'relatedServices',
       type: 'relationship',
       relationTo: 'services',
       hasMany: true,
-      label: 'Связанные услуги',
+      label: loc('Связанные услуги', 'Related services'),
     },
     seoFields,
   ],

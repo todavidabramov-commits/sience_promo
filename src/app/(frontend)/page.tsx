@@ -5,22 +5,28 @@ import { CountUp } from '@/components/CountUp'
 import { HeroMark } from '@/components/HeroMark'
 import { LeadForm } from '@/components/LeadForm'
 import { Reveal, RevealHero, RevealItem, RevealStagger } from '@/components/Reveal'
-import {
-  DEFAULT_CTA,
-  DEFAULT_EXPERTS,
-  DEFAULT_HOME_DOCS,
-  DEFAULT_INDUSTRIES,
-  DEFAULT_METRICS,
-  DEFAULT_PROJECTS,
-  DEFAULT_PUBLICATIONS,
-  DEFAULT_SERVICES,
-  DEFAULT_STATS,
-  DEFAULT_STEPS,
-  SERVICE_ICON_SRC,
-} from '@/lib/content'
+import { getDocuments, getExperts, getProjects, getPublications, getServices } from '@/cms/queries'
+import { getCatalog } from '@/i18n/catalog'
+import { getLocale } from '@/i18n/get-locale'
+import { getMessages } from '@/i18n/messages'
+import { SERVICE_ICON_SRC } from '@/lib/content'
 
-export default function HomePage() {
-  const serviceOptions = DEFAULT_SERVICES.map((s) => ({ id: s.slug, title: s.title }))
+export default async function HomePage() {
+  const locale = await getLocale()
+  const t = getMessages(locale).home
+  const catalog = getCatalog(locale)
+  const [services, projects, experts, publications, documents] = await Promise.all([
+    getServices(locale),
+    getProjects(locale),
+    getExperts(locale),
+    getPublications(locale),
+    getDocuments(locale),
+  ])
+  const serviceOptions = services.map((s) => ({ id: s.slug, title: s.title }))
+  const homeProjects = projects.filter((item) => item.showOnHome)
+  const homeExperts = experts.filter((item) => item.showOnHome)
+  const homePubs = publications.filter((item) => item.showOnHome)
+  const homeDocs = documents.filter((item) => item.showOnHome)
 
   return (
     <>
@@ -41,22 +47,18 @@ export default function HomePage() {
         <div className="home-wrap home-hero__content">
           <div className="home-hero__main">
             <RevealHero className="home-hero__copy">
-              <span className="home-tag">Экспертиза высшего уровня</span>
-              <h1>Научная точность в расчете экологических рисков и обосновании СЗЗ</h1>
-              <p>
-                Проектирование и экспертиза в области санитарно-эпидемиологической безопасности,
-                промышленного шума и токсикологии. Надежные решения для авиации, девелопмента и крупной
-                промышленности.
-              </p>
+              <span className="home-tag">{t.tag}</span>
+              <h1>{t.title}</h1>
+              <p>{t.lead}</p>
             </RevealHero>
 
             <RevealHero className="home-hero__actions" delay={0.12}>
               <Link className="home-btn home-btn--primary" href="/kontakty?type=proposal">
-                Запросить коммерческое предложение
+                {t.request}
                 <Image src="/images/icons/arrow-right.svg" alt="" width={16} height={16} />
               </Link>
               <Link className="home-btn home-btn--ghost" href="/dokumenty">
-                Презентация центра (PDF)
+                {t.presentation}
               </Link>
             </RevealHero>
           </div>
@@ -64,7 +66,7 @@ export default function HomePage() {
           <HeroMark />
 
           <RevealHero className="home-hero__stats" delay={0.22}>
-            {DEFAULT_STATS.map((stat) => (
+            {catalog.stats.map((stat) => (
               <div key={stat.label}>
                 <CountUp value={stat.value} />
                 <span>{stat.label}</span>
@@ -77,16 +79,13 @@ export default function HomePage() {
       <section className="home-section">
         <div className="home-wrap">
           <Reveal className="home-section__head">
-            <span className="home-tag">Направления деятельности</span>
-            <h2>Комплексные исследования и гигиеническая оценка рисков</h2>
-            <p className="home-section__aside">
-              Разрабатываем технические решения, строго соответствующие федеральному законодательству
-              и методикам Минприроды и Роспотребнадзора.
-            </p>
+            <span className="home-tag">{t.servicesTag}</span>
+            <h2>{t.servicesTitle}</h2>
+            <p className="home-section__aside">{t.servicesAside}</p>
           </Reveal>
 
           <RevealStagger className="home-services" stagger={0.07}>
-            {DEFAULT_SERVICES.map((service) => {
+            {services.map((service) => {
               const icon = SERVICE_ICON_SRC[service.icon] || SERVICE_ICON_SRC['shield-alert']
               return (
                 <RevealItem key={service.slug}>
@@ -107,11 +106,11 @@ export default function HomePage() {
       <section className="home-section home-section--muted">
         <div className="home-wrap">
           <Reveal className="home-section__head home-section__head--center">
-            <span className="home-tag">Научно-экспертный потенциал</span>
-            <h2>Почему нам доверяют экспертизу государственного масштаба</h2>
+            <span className="home-tag">{t.metricsTag}</span>
+            <h2>{t.metricsTitle}</h2>
           </Reveal>
           <RevealStagger className="home-metrics" stagger={0.09}>
-            {DEFAULT_METRICS.map((item) => (
+            {catalog.metrics.map((item) => (
               <RevealItem key={item.title}>
                 <article className="home-metric">
                   <strong>{item.value}</strong>
@@ -127,11 +126,11 @@ export default function HomePage() {
       <section className="home-section">
         <div className="home-wrap">
           <Reveal className="home-section__head">
-            <span className="home-tag">Отраслевые решения</span>
-            <h2>Отрасли наших ключевых заказчиков</h2>
+            <span className="home-tag">{t.industriesTag}</span>
+            <h2>{t.industriesTitle}</h2>
           </Reveal>
           <RevealStagger className="home-industries" stagger={0.06}>
-            {DEFAULT_INDUSTRIES.map((item) => (
+            {catalog.industries.map((item) => (
               <RevealItem key={item.title}>
                 <article className="home-industry">
                   <span className="home-industry__icon">
@@ -157,15 +156,15 @@ export default function HomePage() {
         <div className="home-wrap">
           <Reveal className="home-section__head home-section__head--row">
             <div>
-              <span className="home-tag">Успешные кейсы</span>
-              <h2>Реализованные проекты и экспертные заключения</h2>
+              <span className="home-tag">{t.casesTag}</span>
+              <h2>{t.casesTitle}</h2>
             </div>
             <Link className="home-btn home-btn--outline home-btn--sm" href="/proekty">
-              Все проекты
+              {t.allProjects}
             </Link>
           </Reveal>
           <RevealStagger className="home-cases" stagger={0.1}>
-            {DEFAULT_PROJECTS.map((project) => (
+            {(homeProjects.length ? homeProjects : projects).map((project) => (
               <RevealItem key={project.slug}>
                 <Link className="home-case" href={`/proekty/${project.slug}`}>
                   <div className="home-case__media">
@@ -182,7 +181,7 @@ export default function HomePage() {
                     <h3>{project.title}</h3>
                     <hr className="home-case__rule" />
                     <p>
-                      <span className="home-case__label">Объем работ: </span>
+                      <span className="home-case__label">{t.scope}</span>
                       <strong>{project.summary}</strong>
                     </p>
                   </div>
@@ -196,11 +195,11 @@ export default function HomePage() {
       <section className="home-section">
         <div className="home-wrap">
           <Reveal className="home-section__head home-section__head--center">
-            <span className="home-tag">Порядок реализации</span>
-            <h2>Этапы проектирования и экспертизы до получения СЭЗ</h2>
+            <span className="home-tag">{t.stepsTag}</span>
+            <h2>{t.stepsTitle}</h2>
           </Reveal>
           <RevealStagger className="home-steps" stagger={0.08}>
-            {DEFAULT_STEPS.map((step) => (
+            {catalog.steps.map((step) => (
               <RevealItem key={step.num}>
                 <article className="home-step">
                   <strong>{step.num}</strong>
@@ -216,11 +215,11 @@ export default function HomePage() {
       <section className="home-section home-section--muted">
         <div className="home-wrap">
           <Reveal className="home-section__head">
-            <span className="home-tag">Научный совет</span>
-            <h2>Наши ведущие эксперты и академики</h2>
+            <span className="home-tag">{t.expertsTag}</span>
+            <h2>{t.expertsTitle}</h2>
           </Reveal>
           <RevealStagger className="home-experts" stagger={0.1}>
-            {DEFAULT_EXPERTS.map((expert) => (
+            {(homeExperts.length ? homeExperts : experts).map((expert) => (
               <RevealItem key={expert.slug}>
                 <article className="home-expert">
                   <div className="home-expert__media">
@@ -248,11 +247,11 @@ export default function HomePage() {
         <div className="home-wrap home-knowledge">
           <Reveal className="home-knowledge__col">
             <div className="home-knowledge__head">
-              <span className="home-tag">База знаний</span>
-              <h2>Научные публикации и методические материалы</h2>
+              <span className="home-tag">{t.knowledgeTag}</span>
+              <h2>{t.knowledgeTitle}</h2>
             </div>
             <div className="home-pubs">
-              {DEFAULT_PUBLICATIONS.map((pub) => (
+              {homePubs.map((pub) => (
                 <Link className="home-pub" href={`/publikacii/${pub.slug}`} key={pub.slug}>
                   <span className="home-pub__cat">{pub.category}</span>
                   <strong>{pub.title}</strong>
@@ -264,19 +263,19 @@ export default function HomePage() {
 
           <Reveal className="home-knowledge__col" delay={0.1}>
             <div className="home-knowledge__head">
-              <span className="home-tag">Шаблоны и стандарты</span>
-              <h2>Формы и регламенты Роспотребнадзора</h2>
+              <span className="home-tag">{t.docsTag}</span>
+              <h2>{t.docsTitle}</h2>
             </div>
             <div className="home-docs">
-              {DEFAULT_HOME_DOCS.map((doc) => (
-                <Link className="home-doc" href="/dokumenty" key={doc.title}>
+              {homeDocs.map((doc) => (
+                <Link className="home-doc" href="/dokumenty" key={doc.code}>
                   <span className="home-docs__icon">
                     <Image src="/images/icons/file-text.svg" alt="" width={20} height={20} />
                   </span>
                   <span className="home-doc__info">
                     <strong>{doc.title}</strong>
                     <span className="home-doc__meta">
-                      <em>{doc.meta}</em>
+                      <em>{doc.homeMeta}</em>
                       <em className="home-doc__file">{doc.file}</em>
                     </span>
                   </span>
@@ -298,12 +297,12 @@ export default function HomePage() {
         <div className="home-wrap home-cta">
           <Reveal className="home-cta__copy">
             <div className="home-cta__intro">
-              <span className="home-tag">{DEFAULT_CTA.tag}</span>
-              <h2>{DEFAULT_CTA.title}</h2>
-              <p>{DEFAULT_CTA.text}</p>
+              <span className="home-tag">{catalog.cta.tag}</span>
+              <h2>{catalog.cta.title}</h2>
+              <p>{catalog.cta.text}</p>
             </div>
             <ul>
-              {DEFAULT_CTA.checks.map((item) => {
+              {catalog.cta.checks.map((item) => {
                 const [lead, ...rest] = item.split(' — ')
                 return (
                   <li key={item}>

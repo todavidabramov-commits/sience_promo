@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
-import { DEFAULT_NAV } from '@/lib/content'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { useLocale } from '@/i18n/locale-context'
 
 type NavItem = { label: string; href: string }
 
@@ -24,13 +25,14 @@ export function SiteHeader({
   phone?: string | null
   email?: string | null
   address?: string | null
-  nav?: NavItem[] | null
-  ctaLabel?: string | null
+  nav: NavItem[]
+  ctaLabel: string
   ctaHref?: string | null
 }) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
-  const items = nav?.length ? nav : [...DEFAULT_NAV]
+  const { messages } = useLocale()
+  const items = nav
 
   useEffect(() => {
     const html = document.documentElement
@@ -69,15 +71,19 @@ export function SiteHeader({
           </span>
           <span className="brand-text">
             <strong>{companyName}</strong>
-            <span>{tagline || 'Экспертный центр'}</span>
+            <span>{tagline || messages.common.tagline}</span>
           </span>
         </Link>
+
+        <div className="site-header__lang site-header__lang--mobile">
+          <LanguageSwitcher />
+        </div>
 
         <button
           type="button"
           className={`mobile-nav-toggle${open ? ' is-open' : ''}`}
           aria-expanded={open}
-          aria-label={open ? 'Закрыть меню' : 'Открыть меню'}
+          aria-label={open ? messages.common.closeMenu : messages.common.openMenu}
           onClick={() => setOpen((v) => !v)}
         >
           <span className="mobile-nav-toggle__waves" aria-hidden>
@@ -108,7 +114,7 @@ export function SiteHeader({
           </div>
           <div className="nav__footer">
             <div className="nav__phone">
-              <span className="nav__caption">Телефон</span>
+              <span className="nav__caption">{messages.common.phone}</span>
               {phone ? (
                 <a className="nav-phone" href={`tel:${phone.replace(/[^\d+]/g, '')}`}>
                   {phone}
@@ -116,7 +122,7 @@ export function SiteHeader({
               ) : null}
             </div>
             <div className="nav__contacts">
-              <span className="nav__caption">Контакты</span>
+              <span className="nav__caption">{messages.common.contacts}</span>
               {email ? (
                 <a href={`mailto:${email}`} onClick={() => setOpen(false)}>
                   {email}
@@ -128,7 +134,7 @@ export function SiteHeader({
                 href={ctaHref || '/kontakty?type=proposal'}
                 onClick={() => setOpen(false)}
               >
-                {ctaLabel || 'Запросить КП'}
+                {ctaLabel}
                 <Image src="/images/icons/arrow-right.svg" alt="" width={16} height={16} />
               </Link>
             </div>
@@ -136,6 +142,9 @@ export function SiteHeader({
         </nav>
 
         <div className="site-header__actions site-header__actions--desktop">
+          <div className="site-header__lang site-header__lang--desktop">
+            <LanguageSwitcher />
+          </div>
           {phone ? (
             <a className="nav-phone" href={`tel:${phone.replace(/[^\d+]/g, '')}`}>
               {phone}
@@ -146,7 +155,7 @@ export function SiteHeader({
             href={ctaHref || '/kontakty?type=proposal'}
             onClick={() => setOpen(false)}
           >
-            {ctaLabel || 'Запросить КП'}
+            {ctaLabel}
             <Image src="/images/icons/arrow-right.svg" alt="" width={16} height={16} />
           </Link>
         </div>

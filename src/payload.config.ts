@@ -1,6 +1,7 @@
 import { vercelPostgresAdapter } from '@payloadcms/db-vercel-postgres'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { en } from '@payloadcms/translations/languages/en'
 import { ru } from '@payloadcms/translations/languages/ru'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -30,12 +31,20 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     meta: {
-      titleSuffix: ' — СанЭпидЭксперт',
+      titleSuffix: ' — СанЭпидЭксперт / SanEpidExpert',
     },
   },
   i18n: {
     fallbackLanguage: 'ru',
-    supportedLanguages: { ru },
+    supportedLanguages: { ru, en },
+  },
+  localization: {
+    defaultLocale: 'ru',
+    fallback: true,
+    locales: [
+      { code: 'ru', label: 'Русский' },
+      { code: 'en', label: 'English' },
+    ],
   },
   collections: [
     Users,

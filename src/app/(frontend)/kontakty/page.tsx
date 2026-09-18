@@ -5,20 +5,28 @@ import Link from 'next/link'
 import { ContactsYandexMap } from '@/components/ContactsYandexMap'
 import { LeadForm } from '@/components/LeadForm'
 import { Reveal, RevealHero, RevealItem, RevealStagger } from '@/components/Reveal'
-import {
-  CONTACT_CHANNELS,
-  CONTACT_OFFICE,
-  CONTACT_REQUISITES,
-  CONTACT_RFP_DOCS,
-} from '@/lib/content'
+import { getContacts, getServiceOptions } from '@/cms/queries'
+import { getLocale } from '@/i18n/get-locale'
+import { getMessages } from '@/i18n/messages'
 
-export const metadata: Metadata = {
-  title: 'Контакты',
-  description:
-    'Контакты экспертного центра и навигационная карта. Свяжитесь с руководителями инспекционных направлений.',
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getMessages(await getLocale()).contacts
+  return { title: t.metaTitle, description: t.metaDescription }
 }
 
-export default function ContactsPage() {
+export default async function ContactsPage() {
+  const locale = await getLocale()
+  const t = getMessages(locale).contacts
+  const common = getMessages(locale).common
+  const [contacts, serviceOptions] = await Promise.all([
+    getContacts(locale),
+    getServiceOptions(locale),
+  ])
+  const requisitesColumns = [
+    contacts.requisites.slice(0, Math.ceil(contacts.requisites.length / 2)),
+    contacts.requisites.slice(Math.ceil(contacts.requisites.length / 2)),
+  ].filter((column) => column.length)
+
   return (
     <>
       <section className="about-hero">
@@ -36,19 +44,16 @@ export default function ContactsPage() {
         </div>
         <div className="home-wrap about-hero__content">
           <RevealHero className="about-hero__copy">
-            <nav className="about-crumbs" aria-label="Навигация">
-              <Link href="/">Главная</Link>
+            <nav className="about-crumbs" aria-label={common.crumbs}>
+              <Link href="/">{common.home}</Link>
               <span>/</span>
-              <span>Связь с нами</span>
+              <span>{t.crumbParent}</span>
               <span>/</span>
-              <em>Контакты</em>
+              <em>{t.crumb}</em>
             </nav>
-            <span className="home-tag">Адрес и реквизиты</span>
-            <h1>Контакты экспертного центра и навигационная карта</h1>
-            <p>
-              Свяжитесь напрямую с руководителями инспекционных направлений или посетите наш
-              научно-исследовательский кластер на Ленинском проспекте.
-            </p>
+            <span className="home-tag">{t.tag}</span>
+            <h1>{t.title}</h1>
+            <p>{t.lead}</p>
           </RevealHero>
         </div>
       </section>
@@ -56,7 +61,7 @@ export default function ContactsPage() {
       <section className="home-section home-section--muted">
         <div className="home-wrap contacts-body">
           <RevealStagger className="contacts-channels" stagger={0.08}>
-            {CONTACT_CHANNELS.map((item) => (
+            {contacts.channels.map((item) => (
               <RevealItem key={item.email}>
                 <article className="contacts-card">
                   <h3>{item.title}</h3>
@@ -72,21 +77,21 @@ export default function ContactsPage() {
 
           <Reveal className="contacts-map">
             <div className="contacts-map__info">
-              <span className="home-tag">Адрес</span>
-              <h2>{CONTACT_OFFICE.title}</h2>
-              <p>{CONTACT_OFFICE.address}</p>
+              <span className="home-tag">{t.addressTag}</span>
+              <h2>{contacts.officeTitle}</h2>
+              <p>{contacts.address}</p>
               <div className="contacts-map__hours">
-                <span>Режим работы:</span>
-                <strong>{CONTACT_OFFICE.hours}</strong>
-                <p>{CONTACT_OFFICE.note}</p>
+                <span>{t.hours}</span>
+                <strong>{contacts.hours}</strong>
+                <p>{contacts.officeNote}</p>
               </div>
             </div>
             <div className="contacts-map__visual">
               <ContactsYandexMap
-                lat={CONTACT_OFFICE.coords[0]}
-                lon={CONTACT_OFFICE.coords[1]}
-                title={CONTACT_OFFICE.title}
-                address={CONTACT_OFFICE.address}
+                lat={contacts.lat}
+                lon={contacts.lon}
+                title={contacts.officeTitle}
+                address={contacts.address}
               />
             </div>
           </Reveal>
@@ -94,17 +99,14 @@ export default function ContactsPage() {
           <div className="home-cta">
             <Reveal className="home-cta__copy">
               <div className="home-cta__intro">
-                <span className="home-tag">Расчет затрат</span>
-                <h2>Направить исходные данные на калькуляцию КП</h2>
-                <p>
-                  Прикрепите ситуационный или градостроительный план, и наши инженеры в течение 1
-                  рабочего дня сформируют прозрачное коммерческое предложение.
-                </p>
+                <span className="home-tag">{t.calcTag}</span>
+                <h2>{t.calcTitle}</h2>
+                <p>{t.calcLead}</p>
               </div>
               <div className="contacts-docs">
-                <p className="contacts-docs-label">Желательные исходные документы:</p>
+                <p className="contacts-docs-label">{t.docsLabel}</p>
                 <ul>
-                  {CONTACT_RFP_DOCS.map((item) => (
+                  {contacts.contactDocs.map((item) => (
                     <li key={item}>
                       <Image src="/images/icons/check.svg" alt="" width={16} height={16} />
                       <span>{item}</span>
@@ -114,15 +116,15 @@ export default function ContactsPage() {
               </div>
             </Reveal>
             <Reveal delay={0.1}>
-              <LeadForm type="proposal" variant="contacts" />
+              <LeadForm type="proposal" variant="contacts" services={serviceOptions} />
             </Reveal>
           </div>
 
           <Reveal>
             <article className="contacts-reqs">
-              <h2>Реквизиты организации</h2>
+              <h2>{t.requisites}</h2>
               <dl className="contacts-reqs__grid">
-                {CONTACT_REQUISITES.map((column) => (
+                {requisitesColumns.map((column) => (
                   <div key={column[0].label}>
                     {column.map((item) => (
                       <div key={item.label}>

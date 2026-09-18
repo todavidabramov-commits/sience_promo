@@ -1,3 +1,5 @@
+import { PUBLICATION_BODIES_EN } from './publication-bodies-en'
+
 export type ArticleBlock =
   | { type: 'h2'; text: string }
   | { type: 'p'; text: string }
@@ -292,7 +294,8 @@ export const PUBLICATION_BODIES: Record<string, ArticleBlock[]> = {
   ],
 }
 
-export function getPublicationBody(slug: string): ArticleBlock[] | null {
+export function getPublicationBody(slug: string, locale: 'ru' | 'en' = 'ru'): ArticleBlock[] | null {
+  if (locale === 'en') return PUBLICATION_BODIES_EN[slug] ?? PUBLICATION_BODIES[slug] ?? null
   return PUBLICATION_BODIES[slug] ?? null
 }
 

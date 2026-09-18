@@ -3,15 +3,22 @@ import Image from 'next/image'
 
 import { CatalogSectionMark } from '@/components/CatalogSectionMark'
 import { Reveal, RevealHero, RevealItem, RevealStagger } from '@/components/Reveal'
-import { EXPERT_BOARD, EXPERT_TEAM_STEPS } from '@/lib/content'
+import { getExperts } from '@/cms/queries'
+import { getCatalog } from '@/i18n/catalog'
+import { getLocale } from '@/i18n/get-locale'
+import { getMessages } from '@/i18n/messages'
 
-export const metadata: Metadata = {
-  title: 'Эксперты',
-  description:
-    'Высококвалифицированный Экспертный совет: доктора и кандидаты наук, авторы нормативно-методических документов в сфере гигиены.',
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getMessages(await getLocale()).experts
+  return { title: t.metaTitle, description: t.metaDescription }
 }
 
-export default function ExpertsPage() {
+export default async function ExpertsPage() {
+  const locale = await getLocale()
+  const t = getMessages(locale).experts
+  const catalog = getCatalog(locale)
+  const experts = await getExperts(locale)
+
   return (
     <>
       <section className="about-hero">
@@ -29,13 +36,9 @@ export default function ExpertsPage() {
         </div>
         <div className="home-wrap about-hero__content">
           <RevealHero className="about-hero__copy">
-            <span className="home-tag">Наши эксперты</span>
-            <h1>Высококвалифицированный Экспертный совет без компромиссов</h1>
-            <p>
-              Мы не используем стоковые фотографии и вымышленные регалии. Команда нашего центра
-              состоит из признанных докторов и кандидатов наук, авторов нормативно-методических
-              документов в сфере гигиены.
-            </p>
+            <span className="home-tag">{t.tag}</span>
+            <h1>{t.title}</h1>
+            <p>{t.lead}</p>
           </RevealHero>
         </div>
       </section>
@@ -44,15 +47,12 @@ export default function ExpertsPage() {
         <CatalogSectionMark icon="/images/icons/microscope.svg" />
         <div className="home-wrap">
           <Reveal className="home-section__head">
-            <span className="home-tag">Кадровый потенциал</span>
-            <h2>Ведущие специалисты Органа Инспекции</h2>
-            <p className="about-section-lead">
-              Каждый руководитель направления обладает опытом работы в профильных
-              научно-исследовательских институтах гигиены и токсикологии.
-            </p>
+            <span className="home-tag">{t.staffTag}</span>
+            <h2>{t.staffTitle}</h2>
+            <p className="about-section-lead">{t.staffLead}</p>
           </Reveal>
           <RevealStagger className="experts-list" stagger={0.08}>
-            {EXPERT_BOARD.map((expert) => (
+            {experts.map((expert) => (
               <RevealItem key={expert.slug}>
                 <article className="experts-row">
                   <div className="experts-row__media">
@@ -85,15 +85,12 @@ export default function ExpertsPage() {
       <section className="home-section">
         <div className="home-wrap">
           <Reveal className="home-section__head">
-            <span className="home-tag">Проектный инжиниринг</span>
-            <h2>Как формируется рабочая группа под ваш проект</h2>
-            <p className="about-section-lead">
-              Мы не назначаем универсальных специалистов широкого профиля. Команда собирается под
-              уникальные технологические факторы вашего объекта.
-            </p>
+            <span className="home-tag">{t.teamTag}</span>
+            <h2>{t.teamTitle}</h2>
+            <p className="about-section-lead">{t.teamLead}</p>
           </Reveal>
           <RevealStagger className="experts-steps" stagger={0.08}>
-            {EXPERT_TEAM_STEPS.map((step) => (
+            {catalog.expertSteps.map((step) => (
               <RevealItem key={step.num}>
                 <article className="experts-step">
                   <strong>{step.num}</strong>

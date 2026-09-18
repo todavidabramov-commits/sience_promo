@@ -1,8 +1,10 @@
 import type { GlobalConfig } from 'payload'
 
+import { loc } from '../i18n/label'
+
 export const Header: GlobalConfig = {
   slug: 'header',
-  label: 'Шапка',
+  label: loc('Шапка', 'Header'),
   access: {
     read: () => true,
   },
@@ -10,19 +12,20 @@ export const Header: GlobalConfig = {
     {
       name: 'nav',
       type: 'array',
-      label: 'Навигация',
+      label: loc('Навигация', 'Navigation'),
       fields: [
         {
           name: 'label',
           type: 'text',
           required: true,
-          label: 'Название',
+          localized: true,
+          label: loc('Название', 'Label'),
         },
         {
           name: 'href',
           type: 'text',
           required: true,
-          label: 'Ссылка',
+          label: loc('Ссылка', 'Link'),
         },
       ],
       defaultValue: [
@@ -39,14 +42,15 @@ export const Header: GlobalConfig = {
     {
       name: 'ctaLabel',
       type: 'text',
+      localized: true,
       defaultValue: 'Запросить КП',
-      label: 'Текст кнопки',
+      label: loc('Текст кнопки', 'Button text'),
     },
     {
       name: 'ctaHref',
       type: 'text',
       defaultValue: '/kontakty?type=proposal',
-      label: 'Ссылка кнопки',
+      label: loc('Ссылка кнопки', 'Button link'),
     },
   ],
 }

@@ -1,15 +1,17 @@
 import type { Field } from 'payload'
 
+import { loc } from '../i18n/label'
+
 export const slugField = (fieldToUse = 'title'): Field => ({
   name: 'slug',
   type: 'text',
   required: true,
   unique: true,
   index: true,
-  label: 'Адрес в URL',
+  label: loc('Адрес в URL', 'URL slug'),
   admin: {
     position: 'sidebar',
-    description: 'Формируется автоматически из названия, можно изменить вручную.',
+    description: 'Формируется автоматически из названия, можно изменить вручную. / Generated from the title automatically; you can edit it manually.',
   },
   hooks: {
     beforeValidate: [

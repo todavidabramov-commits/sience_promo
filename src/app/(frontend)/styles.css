@@ -1053,6 +1053,131 @@ p {
   flex-shrink: 0;
 }
 
+.site-header__lang--mobile {
+  display: none;
+}
+
+.lang-switch {
+  position: relative;
+  flex-shrink: 0;
+  z-index: 60;
+}
+
+.lang-switch__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 10px 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+
+.lang-switch__trigger:hover,
+.lang-switch.is-open .lang-switch__trigger {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.lang-switch__globe,
+.lang-switch__chevron {
+  flex-shrink: 0;
+  opacity: 0.86;
+}
+
+.lang-switch__chevron {
+  transition: transform 0.18s ease;
+}
+
+.lang-switch.is-open .lang-switch__chevron {
+  transform: rotate(180deg);
+}
+
+.lang-switch__name {
+  line-height: 1;
+}
+
+.lang-switch__code {
+  display: none;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.lang-switch__menu {
+  position: fixed;
+  z-index: 200;
+  min-width: 196px;
+  padding: 6px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+}
+
+.lang-switch__menu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lang-switch__menu button {
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--navy-900);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lang-switch__menu button:hover {
+  background: var(--surface);
+}
+
+.lang-switch__menu button.is-active {
+  background: rgba(14, 165, 233, 0.1);
+  color: var(--navy-950);
+}
+
+.lang-switch__menu em {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.lang-switch__check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--cyan-500);
+}
+
+.site-header:has(.lang-switch.is-open),
+.site-header:has(.lang-switch.is-open) .site-header__inner {
+  overflow: visible;
+}
+
 .site-header__actions--mobile {
   display: none;
 }
@@ -1210,6 +1335,14 @@ p {
   .nav__links > a {
     font-size: 13px;
   }
+
+  .lang-switch__name {
+    display: none;
+  }
+
+  .lang-switch__code {
+    display: inline;
+  }
 }
 
 @media (max-width: 1280px) {
@@ -1264,6 +1397,34 @@ p {
 
   .mobile-nav-toggle {
     display: inline-flex;
+  }
+
+  .site-header__lang--mobile {
+    display: flex;
+    position: relative;
+    z-index: 50;
+    margin-left: auto;
+    margin-right: 4px;
+  }
+
+  .site-header .brand {
+    gap: 0.5rem;
+    max-width: calc(100% - 120px);
+  }
+
+  .site-header .brand-mark,
+  .site-header .brand-mark img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .site-header .brand strong {
+    font-size: 13px;
+  }
+
+  .site-header .brand-text > span {
+    font-size: 8px;
+    letter-spacing: 0.03em;
   }
 
   .site-header__actions--desktop {
@@ -1660,10 +1821,10 @@ p {
 .hero-mark {
   grid-area: mark;
   position: relative;
-  width: clamp(280px, 36vw, 480px);
-  height: clamp(280px, 36vw, 480px);
+  width: clamp(260px, 32vw, 420px);
+  height: clamp(260px, 32vw, 420px);
   pointer-events: auto;
-  overflow: visible;
+  overflow: hidden;
   cursor: default;
 }
 
@@ -4435,14 +4596,18 @@ p {
     display: inline-flex;
   }
 
-  .brand-mark,
-  .brand-mark img {
-    width: 56px;
-    height: 56px;
+  .site-header .brand-mark,
+  .site-header .brand-mark img {
+    width: 36px;
+    height: 36px;
   }
 
-  .brand strong {
-    font-size: 15px;
+  .site-header .brand strong {
+    font-size: 12px;
+  }
+
+  .site-header .brand-text > span {
+    font-size: 7px;
   }
 
   .home-services,

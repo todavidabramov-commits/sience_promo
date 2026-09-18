@@ -2,22 +2,31 @@
 
 import { useMemo, useState } from 'react'
 
-import { PROJECT_CASES, PROJECT_FILTERS } from '@/lib/content'
+import { useLocale } from '@/i18n/locale-context'
+import type { ProjectView } from '@/cms/types'
 
-export function ProjectsCatalog() {
-  const [filter, setFilter] = useState<(typeof PROJECT_FILTERS)[number]['id']>('all')
+type Filter = { id: string; label: string }
 
-  const cases = useMemo(
-    () =>
-      filter === 'all' ? PROJECT_CASES : PROJECT_CASES.filter((item) => item.section === filter),
-    [filter],
+export function ProjectsCatalog({
+  cases,
+  filters,
+}: {
+  cases: ProjectView[]
+  filters: Filter[]
+}) {
+  const { messages } = useLocale()
+  const [filter, setFilter] = useState('all')
+
+  const visible = useMemo(
+    () => (filter === 'all' ? cases : cases.filter((item) => item.section === filter)),
+    [cases, filter],
   )
 
   return (
     <div className="projects-catalog">
-      <div className="pubs-filters" role="group" aria-label="Отрасль">
-        <span className="pubs-filters__label">Отрасль:</span>
-        {PROJECT_FILTERS.map((item) => (
+      <div className="pubs-filters" role="group" aria-label={messages.projects.industry}>
+        <span className="pubs-filters__label">{messages.projects.industryLabel}</span>
+        {filters.map((item) => (
           <button
             key={item.id}
             type="button"
@@ -30,27 +39,27 @@ export function ProjectsCatalog() {
         ))}
       </div>
 
-      {cases.length === 0 ? (
-        <p className="pubs-empty">В этой отрасли пока нет кейсов.</p>
+      {visible.length === 0 ? (
+        <p className="pubs-empty">{messages.projects.empty}</p>
       ) : (
         <div className="projects-list">
-          {cases.map((item) => (
+          {visible.map((item) => (
             <article className="projects-case" key={item.slug}>
               <div className="projects-case__top">
-                <h3>{item.title}</h3>
+                <h3>{item.headline || item.title}</h3>
                 <span className="projects-case__sector">{item.sector}</span>
               </div>
               <div className="projects-case__grid">
                 <div>
-                  <em>Поставленная задача</em>
+                  <em>{messages.projects.task}</em>
                   <p>{item.task}</p>
                 </div>
                 <div>
-                  <em>Наш экспертный подход</em>
+                  <em>{messages.projects.approach}</em>
                   <p>{item.approach}</p>
                 </div>
                 <div>
-                  <em className="is-result">Итоговый результат</em>
+                  <em className="is-result">{messages.projects.result}</em>
                   <p className="is-result">{item.result}</p>
                 </div>
               </div>
