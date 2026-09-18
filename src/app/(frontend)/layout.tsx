@@ -4,6 +4,7 @@ import React from 'react'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
 import { ScrollToTop } from '@/components/ScrollToTop'
+import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { getContacts } from '@/cms/queries'
 import { getLocale } from '@/i18n/get-locale'
 import { LocaleProvider } from '@/i18n/locale-context'
@@ -37,6 +38,7 @@ export default async function FrontendLayout({ children }: { children: React.Rea
     <html lang={locale}>
       <body>
         <LocaleProvider locale={locale}>
+          <LivePreviewListener />
           <ScrollToTop />
           <SiteHeader
             companyName={contacts.companyName}

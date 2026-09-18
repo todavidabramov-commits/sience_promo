@@ -20,6 +20,8 @@ import { FormSubmissions } from './collections/FormSubmissions'
 import { SiteSettings } from './globals/SiteSettings'
 import { Header } from './globals/Header'
 import { Footer } from './globals/Footer'
+import { previewPath } from './lib/preview'
+import { adminTranslations } from './i18n/admin-translations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -33,10 +35,33 @@ export default buildConfig({
     meta: {
       titleSuffix: ' — СанЭпидЭксперт / SanEpidExpert',
     },
+    components: {
+      actions: [
+        '/components/admin/AdminLanguageSwitcher#AdminLanguageSwitcher',
+        '/components/admin/ContentLocaleHint#ContentLocaleHint',
+      ],
+      beforeLogin: ['/components/admin/AdminLanguageSwitcher#AdminLanguageSwitcher'],
+    },
+    livePreview: {
+      collections: ['services', 'projects', 'publications', 'experts', 'documents', 'pages'],
+      globals: ['site-settings', 'header', 'footer'],
+      url: ({ data, collectionConfig, globalConfig, locale }) => {
+        const slug = collectionConfig?.slug || globalConfig?.slug
+        if (!slug) return '/'
+        const path = previewPath(slug, data) || '/'
+        return locale?.code ? `${path}${path.includes('?') ? '&' : '?'}lng=${locale.code}` : path
+      },
+      breakpoints: [
+        { name: 'mobile', label: 'Mobile', width: 375, height: 667 },
+        { name: 'tablet', label: 'Tablet', width: 768, height: 1024 },
+        { name: 'desktop', label: 'Desktop', width: 1440, height: 900 },
+      ],
+    },
   },
   i18n: {
     fallbackLanguage: 'ru',
     supportedLanguages: { ru, en },
+    translations: adminTranslations,
   },
   localization: {
     defaultLocale: 'ru',

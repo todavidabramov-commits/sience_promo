@@ -5,11 +5,23 @@ import { isLocale, LOCALE_COOKIE, LOCALE_MAX_AGE } from './i18n/config'
 import { detectLocale } from './i18n/detect'
 
 export function proxy(request: NextRequest) {
+  const previewLocale = request.nextUrl.searchParams.get('lng')
+  const requestHeaders = new Headers(request.headers)
+  if (isLocale(previewLocale)) {
+    requestHeaders.set('x-preview-locale', previewLocale)
+  }
+
   const current = request.cookies.get(LOCALE_COOKIE)?.value
-  if (isLocale(current)) return NextResponse.next()
+  if (isLocale(previewLocale) || isLocale(current)) {
+    return NextResponse.next({
+      request: { headers: requestHeaders },
+    })
+  }
 
   const locale = detectLocale(request.headers.get('accept-language'))
-  const response = NextResponse.next()
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  })
   response.cookies.set(LOCALE_COOKIE, locale, {
     path: '/',
     maxAge: LOCALE_MAX_AGE,

@@ -1,10 +1,14 @@
 import type { GlobalConfig } from 'payload'
 
 import { loc } from '../i18n/label'
+import { globalPreview } from '../lib/preview'
 
 export const Footer: GlobalConfig = {
   slug: 'footer',
   label: loc('Подвал', 'Footer'),
+  admin: {
+    preview: globalPreview('footer'),
+  },
   access: {
     read: () => true,
   },

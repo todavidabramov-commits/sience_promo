@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { seoFields } from '../fields/seo'
 import { slugField } from '../fields/slug'
 import { loc } from '../i18n/label'
+import { collectionPreview } from '../lib/preview'
 
 export const Publications: CollectionConfig = {
   slug: 'publications',
@@ -13,6 +14,7 @@ export const Publications: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'section', 'featured', 'updatedAt'],
+    preview: collectionPreview('publications'),
   },
   access: {
     read: () => true,

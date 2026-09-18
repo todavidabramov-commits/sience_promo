@@ -1,10 +1,14 @@
 import type { GlobalConfig } from 'payload'
 
 import { loc } from '../i18n/label'
+import { globalPreview } from '../lib/preview'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
   label: loc('Настройки сайта', 'Site settings'),
+  admin: {
+    preview: globalPreview('site-settings'),
+  },
   access: {
     read: () => true,
   },

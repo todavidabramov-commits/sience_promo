@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { slugField } from '../fields/slug'
 import { loc } from '../i18n/label'
+import { collectionPreview } from '../lib/preview'
 
 export const Experts: CollectionConfig = {
   slug: 'experts',
@@ -12,6 +13,7 @@ export const Experts: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'role', 'updatedAt'],
+    preview: collectionPreview('experts'),
   },
   access: {
     read: () => true,

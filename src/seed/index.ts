@@ -29,13 +29,20 @@ function bodyFromBlocks(blocks: ArticleBlock[] | null | undefined) {
   })
 }
 
+const LOCALIZED_ARRAYS: Record<string, string[]> = {
+  'site-settings': ['contactDocs'],
+  services: ['overview', 'scope', 'stages'],
+  experts: ['tags'],
+  publications: ['body'],
+}
+
 function attachArrayIds(current: unknown, next: Record<string, unknown>[]) {
   const existing = Array.isArray(current) ? (current as Record<string, unknown>[]) : []
   return next.map((item, index) => {
     const row = existing[index] || {}
     const patched: Record<string, unknown> = {
       ...item,
-      ...(typeof row.id === 'string' ? { id: row.id } : {}),
+      ...(row.id != null ? { id: row.id } : {}),
     }
     for (const [key, value] of Object.entries(item)) {
       if (!Array.isArray(value)) continue
@@ -45,15 +52,20 @@ function attachArrayIds(current: unknown, next: Record<string, unknown>[]) {
   })
 }
 
-function withExistingIds(current: Record<string, unknown>, data: Record<string, unknown>) {
+function withExistingIds(
+  current: Record<string, unknown>,
+  data: Record<string, unknown>,
+  localizedArrays: string[] = [],
+) {
   const next = { ...data }
   delete next.id
   delete next.createdAt
   delete next.updatedAt
+  delete next.globalType
   for (const [key, value] of Object.entries(data)) {
-    if (Array.isArray(value)) {
-      next[key] = attachArrayIds(current[key], value as Record<string, unknown>[])
-    }
+    if (!Array.isArray(value)) continue
+    if (localizedArrays.includes(key)) continue
+    next[key] = attachArrayIds(current[key], value as Record<string, unknown>[])
   }
   return next
 }
@@ -64,6 +76,7 @@ async function updateGlobalLocales(
   ru: Record<string, unknown>,
   en: Record<string, unknown>,
 ) {
+  const localizedArrays = LOCALIZED_ARRAYS[slug] || []
   await payload.updateGlobal({ slug, locale: 'ru', data: ru as never })
   const afterRu = (await payload.findGlobal({ slug, locale: 'ru', depth: 0 })) as unknown as Record<
     string,
@@ -72,7 +85,7 @@ async function updateGlobalLocales(
   await payload.updateGlobal({
     slug,
     locale: 'en',
-    data: withExistingIds(afterRu, en) as never,
+    data: withExistingIds(afterRu, en, localizedArrays) as never,
   })
   const afterEn = (await payload.findGlobal({ slug, locale: 'ru', depth: 0 })) as unknown as Record<
     string,
@@ -81,7 +94,7 @@ async function updateGlobalLocales(
   await payload.updateGlobal({
     slug,
     locale: 'ru',
-    data: withExistingIds(afterEn, ru) as never,
+    data: withExistingIds(afterEn, ru, localizedArrays) as never,
   })
 }
 
@@ -106,7 +119,7 @@ async function createLocalized(
     collection,
     id: created.id,
     locale: 'en',
-    data: withExistingIds(doc, en) as never,
+    data: withExistingIds(doc, en, LOCALIZED_ARRAYS[collection] || []) as never,
   })
 }
 
