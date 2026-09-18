@@ -10,9 +10,17 @@ process.env.DRIZZLE_AUTO_CREATE = '1'
 
 const require = createRequire(import.meta.url)
 
-const originalLoad = Module._load
-Module._load = function patchedLoad(request, parent, isMain) {
-  const loaded = originalLoad.apply(this, arguments as unknown as [string, NodeModule | undefined, boolean])
+type ModuleLoad = (
+  this: unknown,
+  request: string,
+  parent: NodeModule | undefined,
+  isMain: boolean,
+) => unknown
+
+const nodeModule = Module as typeof Module & { _load: ModuleLoad }
+const originalLoad = nodeModule._load
+nodeModule._load = function patchedLoad(request, parent, isMain) {
+  const loaded = originalLoad.call(this, request, parent, isMain)
   if (request === 'prompts' && typeof loaded === 'function') {
     const autoConfirm = async (questions: unknown, options: unknown) => {
       const list = Array.isArray(questions) ? questions : [questions]
