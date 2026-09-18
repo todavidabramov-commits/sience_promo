@@ -36,8 +36,11 @@ It answers the industrial and development client’s request: understand the cen
 
 ### CMS
 
-- **Payload 3** with a Russian and English admin: services, projects, experts, publications, documents, enquiries, media, site settings, header and footer. Language is switched by a single site switcher (cookie `payload-lng`) and immediately applies to `/admin`.
-- Starter content lives in `src/lib/content.ts` — the site is filled before import into the database.
+- **Payload 3**: services, projects, experts, publications, documents, pages, enquiries, media, site settings, header and footer.
+- Admin UI is **Russian / English**. `/admin` has its own switcher (same pattern as the site); cookie `payload-lng` is shared, so the panel language and the public site stay in sync.
+- Content is localized separately: each record has **Russian** and **English** versions. The admin header has a “Content language” switcher and a hint. Unfilled fields in the selected language fall back to the Russian values on the site. There is no auto-translate: each version is filled and saved independently (or copied with “Copy to another language”).
+- **Live Preview**: services, projects, publications, experts, documents, pages, plus settings, header and footer. Preview opens the matching site route with `?lng=` for the current content language; the page refreshes on save. The same setup works on Vercel: URLs are relative.
+- Starter copy lives in `src/lib/content.ts` and `src/i18n/en-catalog.ts`. `npm run seed` writes it into the database.
 - Production-ready on **Vercel Postgres (Neon)** and **Vercel Blob**.
 
 ---
@@ -59,7 +62,7 @@ It answers the industrial and development client’s request: understand the cen
 | --- | --- |
 | Frontend | Next.js 16, React 19, CSS, Motion |
 | 3D | React Three Fiber, Drei, Three.js |
-| CMS | Payload 3.89, Lexical, Russian and English admin |
+| CMS | Payload 3.89, Lexical, RU/EN UI, content localization, Live Preview |
 | Data | Vercel Postgres / Neon |
 | Files | Vercel Blob (prod), disk locally |
 | Forms | yup, react-hook-form, react-imask |
@@ -76,6 +79,7 @@ It answers the industrial and development client’s request: understand the cen
 | `/uslugi` | Service catalogue |
 | `/uslugi/[slug]` | Practice card |
 | `/proekty` | Projects |
+| `/proekty/[slug]` | Project card |
 | `/eksperty` | Expert board |
 | `/publikacii` | Publications |
 | `/publikacii/[slug]` | Article |
@@ -87,22 +91,31 @@ It answers the industrial and development client’s request: understand the cen
 
 ## Local run
 
-Node.js 20+ and PostgreSQL (local or Neon) are required.
+Node.js 20+ and PostgreSQL are required. Docker starts the local database:
 
 ```bash
 cd sience-promo
 cp .env.example .env
+docker compose up -d
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Admin: [http://localhost:3000/admin](http://localhost:3000/admin).
+Open [http://localhost:3000](http://localhost:3000). Admin: [http://localhost:3000/admin](http://localhost:3000/admin). The first user is created in the admin on first visit — seed does not create one.
+
+Load Russian and English CMS content:
+
+```bash
+npm run seed
+```
+
+Overwrite content: `npm run seed -- --force`. Repair globals (header, footer, settings): `npm run seed -- --repair`.
 
 In `.env` set at least:
 
 ```env
 PAYLOAD_SECRET=a-long-random-secret
-POSTGRES_URL=postgresql://...
+POSTGRES_URL=postgresql://postgres:postgres@127.0.0.1:5432/sience_promo
 NEXT_PUBLIC_SERVER_URL=http://localhost:3000
 ```
 
@@ -120,10 +133,14 @@ Optional:
 3. Variables: `PAYLOAD_SECRET`, `POSTGRES_URL`, `BLOB_READ_WRITE_TOKEN`, `NEXT_PUBLIC_SERVER_URL`.
 4. Build: `npm run ci` (`payload migrate` + `next build`).
 
-After deploy check the home page, inner service pages, form submission and `/admin`.
+After deploy check the home page, inner service pages, form submission, `/admin`, live preview of a record, and both content-language versions.
 
 ---
 
 ## Languages
 
-The site has a single **RU / EN** switcher. It writes the `payload-lng` cookie (the same one Payload admin reads), so the public site and `/admin` switch together. If the cookie is not set yet, the language is taken from the browser `Accept-Language`: Russian and CIS countries — Russian, otherwise English.
+Two independent layers.
+
+**Interface language.** The site and the admin both have **RU / EN** switchers. Both write the `payload-lng` cookie: this changes public chrome and Payload panels, not record copy. If the cookie is not set yet, the language is taken from `Accept-Language`: Russian and CIS countries — Russian, otherwise English.
+
+**Content language.** Collection and global fields are stored separately for `ru` and `en` (Payload `localization`, default locale Russian, fallback on). In admin this is the centred “Content language” switcher. Live Preview passes the selected version as `?lng=` and does not overwrite the visitor cookie.
