@@ -6,6 +6,8 @@ import { useMemo, useState } from 'react'
 import { HighlightText } from '@/components/HighlightText'
 import { fill } from '@/i18n/label'
 import { useLocale } from '@/i18n/locale-context'
+import { mapDocument } from '@/cms/map'
+import { useLiveCollectionList } from '@/components/LivePreviewListener'
 import type { DocumentView } from '@/cms/types'
 
 type Filter = { id: string; label: string }
@@ -21,10 +23,16 @@ export function DocumentsCatalog({
   const t = messages.docs
   const [filter, setFilter] = useState('all')
   const [query, setQuery] = useState('')
+  const liveDocuments = useLiveCollectionList(
+    'documents',
+    documents,
+    (doc, initial) => mapDocument(doc, { live: true, fallback: initial }),
+    (item) => item.code,
+  )
 
   const docs = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return documents.filter((item) => {
+    return liveDocuments.filter((item) => {
       if (filter !== 'all' && item.section !== filter) return false
       if (!q) return true
       const sectionLabel = filters.find((entry) => entry.id === item.section)?.label || ''
@@ -35,7 +43,7 @@ export function DocumentsCatalog({
         sectionLabel.toLowerCase().includes(q)
       )
     })
-  }, [documents, filter, filters, query])
+  }, [liveDocuments, filter, filters, query])
 
   function reset() {
     setQuery('')
@@ -102,8 +110,8 @@ export function DocumentsCatalog({
           </label>
           <p className="docs-meta" aria-live="polite">
             {query || filter !== 'all'
-              ? fill(t.found, { n: docs.length, total: documents.length })
-              : fill(t.count, { n: documents.length })}
+              ? fill(t.found, { n: docs.length, total: liveDocuments.length })
+              : fill(t.count, { n: liveDocuments.length })}
           </p>
         </div>
       </div>

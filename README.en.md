@@ -39,7 +39,7 @@ It answers the industrial and development client’s request: understand the cen
 - **Payload 3**: services, projects, experts, publications, documents, pages, enquiries, media, site settings, header and footer.
 - Admin UI is **Russian / English**. `/admin` has its own switcher (same pattern as the site); cookie `payload-lng` is shared, so the panel language and the public site stay in sync.
 - Content is localized separately: each record has **Russian** and **English** versions. The admin header has a “Content language” switcher and a hint. Unfilled fields in the selected language fall back to the Russian values on the site. There is no auto-translate: each version is filled and saved independently (or copied with “Copy to another language”).
-- **Live Preview**: services, projects, publications, experts, documents, pages, plus settings, header and footer. Preview opens the matching site route with `?lng=` for the current content language; the page refreshes on save. The same setup works on Vercel: URLs are relative.
+- **Live Preview**: services, projects, publications, experts, documents, pages, plus settings, header and footer. Preview opens the matching site route with `?lng=` for the current content language. Copy in the iframe updates as you type; expert photos, project/publication covers and document files do too (the media URL is resolved from the upload ID). In admin use the **Photo** / **Cover** / **File** upload fields, not the text “path to …” fields. The same setup works on Vercel: URLs are relative.
 - Starter copy lives in `src/lib/content.ts` and `src/i18n/en-catalog.ts`. `npm run seed` writes it into the database.
 - Production-ready on **Vercel Postgres (Neon)** and **Vercel Blob**.
 

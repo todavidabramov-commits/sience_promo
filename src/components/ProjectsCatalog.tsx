@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react'
 
+import { mapProject } from '@/cms/map'
+import { useLiveCollectionList } from '@/components/LivePreviewListener'
 import { useLocale } from '@/i18n/locale-context'
 import type { ProjectView } from '@/cms/types'
 
@@ -16,10 +18,16 @@ export function ProjectsCatalog({
 }) {
   const { messages } = useLocale()
   const [filter, setFilter] = useState('all')
+  const liveCases = useLiveCollectionList(
+    'projects',
+    cases,
+    (doc, initial) => mapProject(doc, { live: true, fallback: initial }),
+    (item) => item.slug,
+  )
 
   const visible = useMemo(
-    () => (filter === 'all' ? cases : cases.filter((item) => item.section === filter)),
-    [cases, filter],
+    () => (filter === 'all' ? liveCases : liveCases.filter((item) => item.section === filter)),
+    [liveCases, filter],
   )
 
   return (

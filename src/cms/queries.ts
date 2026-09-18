@@ -2,108 +2,12 @@ import type { Locale } from '@/i18n/config'
 import { getCatalog } from '@/i18n/catalog'
 import { getMessages } from '@/i18n/messages'
 import { getPayloadClient } from '@/lib/payload'
-import type { ArticleBlock } from '@/lib/publication-bodies'
 
+import { mapDocument, mapExpert, mapProject, mapPublication, mapService } from './map'
 import { cmsLocale, type ContactsView, type DocumentView, type ExpertView, type ProjectView, type PublicationView, type ServiceView } from './types'
-import { asList, mediaUrl, text } from './utils'
+import { asList, text } from './utils'
 
 type Doc = Record<string, unknown>
-
-function mapService(doc: Doc): ServiceView {
-  return {
-    slug: text(doc.slug),
-    title: text(doc.title),
-    summary: text(doc.summary),
-    result: text(doc.result),
-    icon: text(doc.icon, 'shield-alert'),
-    lead: text(doc.lead, text(doc.summary)),
-    about: asList<{ text?: string }>(doc.overview).map((item) => text(item.text)).filter(Boolean),
-    scope: asList<{ item?: string }>(doc.scope).map((item) => text(item.item)).filter(Boolean),
-    stages: asList<{ title?: string; text?: string }>(doc.stages).map((item) => ({
-      title: text(item.title),
-      text: text(item.text),
-    })),
-    audience: text(doc.audience),
-  }
-}
-
-function mapProject(doc: Doc): ProjectView {
-  const title = text(doc.title)
-  return {
-    slug: text(doc.slug),
-    title,
-    headline: text(doc.headline, title),
-    summary: text(doc.summary),
-    clientType: text(doc.clientLabel, text(doc.clientType)),
-    sector: text(doc.sector, text(doc.clientType)),
-    section: text(doc.section, 'urban'),
-    task: text(doc.task),
-    approach: text(doc.approach),
-    result: text(doc.result),
-    image: mediaUrl(doc.cover, text(doc.image, '/images/cases/case-1-hq.png')),
-    showOnHome: Boolean(doc.showOnHome),
-  }
-}
-
-function mapExpert(doc: Doc): ExpertView {
-  return {
-    slug: text(doc.slug),
-    name: text(doc.name),
-    role: text(doc.role),
-    title: text(doc.title, text(doc.role)),
-    credentials: text(doc.credentials),
-    bio: text(doc.bio),
-    tags: asList<{ item?: string }>(doc.tags).concat(asList<{ item?: string }>(doc.competencies)).map((item) => text(item.item)).filter(Boolean),
-    image: mediaUrl(doc.photo, text(doc.image, '/images/experts/expert-1.png')),
-    showOnHome: doc.showOnHome !== false,
-  }
-}
-
-function mapBody(value: unknown): ArticleBlock[] {
-  return asList<{ blockType?: string; text?: string; items?: { item?: string }[] }>(value)
-    .map((block) => {
-      if (block.blockType === 'h2') return { type: 'h2' as const, text: text(block.text) }
-      if (block.blockType === 'ul') {
-        return {
-          type: 'ul' as const,
-          items: asList<{ item?: string }>(block.items).map((item) => text(item.item)).filter(Boolean),
-        }
-      }
-      return { type: 'p' as const, text: text(block.text) }
-    })
-    .filter((block) => (block.type === 'ul' ? block.items.length : block.text))
-}
-
-function mapPublication(doc: Doc): PublicationView {
-  return {
-    slug: text(doc.slug),
-    title: text(doc.title),
-    excerpt: text(doc.excerpt),
-    category: text(doc.categoryLabel, text(doc.category)),
-    date: text(doc.dateLabel),
-    readTime: text(doc.readTime),
-    section: text(doc.section, 'science'),
-    image: mediaUrl(doc.cover, text(doc.image, '/images/publications/featured.png')),
-    featured: Boolean(doc.featured),
-    showInCatalog: doc.showInCatalog !== false,
-    showOnHome: Boolean(doc.showOnHome),
-    body: mapBody(doc.body),
-  }
-}
-
-function mapDocument(doc: Doc): DocumentView {
-  return {
-    code: text(doc.code),
-    title: text(doc.title),
-    excerpt: text(doc.excerpt),
-    section: text(doc.section, 'federal'),
-    file: text(doc.fileLabel, 'PDF'),
-    homeMeta: text(doc.homeMeta),
-    showInCatalog: doc.showInCatalog !== false,
-    showOnHome: Boolean(doc.showOnHome),
-    downloadUrl: mediaUrl(doc.file),
-  }
-}
 
 async function findAll(collection: string, locale: Locale) {
   const payload = await getPayloadClient()
@@ -120,7 +24,7 @@ async function findAll(collection: string, locale: Locale) {
 export async function getServices(locale: Locale): Promise<ServiceView[]> {
   try {
     const docs = await findAll('services', locale)
-    if (docs.length) return docs.filter((doc) => text(doc.slug)).map(mapService)
+    if (docs.length) return docs.filter((doc) => text(doc.slug)).map((doc) => mapService(doc))
   } catch {
     /* empty database or schema not pushed yet */
   }
@@ -135,7 +39,7 @@ export async function getService(slug: string, locale: Locale): Promise<ServiceV
 export async function getProjects(locale: Locale): Promise<ProjectView[]> {
   try {
     const docs = await findAll('projects', locale)
-    if (docs.length) return docs.filter((doc) => text(doc.slug)).map(mapProject)
+    if (docs.length) return docs.filter((doc) => text(doc.slug)).map((doc) => mapProject(doc))
   } catch {
     /* fallback */
   }
@@ -167,7 +71,7 @@ export async function getProject(slug: string, locale: Locale): Promise<ProjectV
 export async function getExperts(locale: Locale): Promise<ExpertView[]> {
   try {
     const docs = await findAll('experts', locale)
-    if (docs.length) return docs.filter((doc) => text(doc.slug)).map(mapExpert)
+    if (docs.length) return docs.filter((doc) => text(doc.slug)).map((doc) => mapExpert(doc))
   } catch {
     /* fallback */
   }
@@ -191,7 +95,7 @@ export async function getExperts(locale: Locale): Promise<ExpertView[]> {
 export async function getPublications(locale: Locale): Promise<PublicationView[]> {
   try {
     const docs = await findAll('publications', locale)
-    if (docs.length) return docs.filter((doc) => text(doc.slug)).map(mapPublication)
+    if (docs.length) return docs.filter((doc) => text(doc.slug)).map((doc) => mapPublication(doc))
   } catch {
     /* fallback */
   }
@@ -250,7 +154,7 @@ export async function getPublication(slug: string, locale: Locale): Promise<Publ
 export async function getDocuments(locale: Locale): Promise<DocumentView[]> {
   try {
     const docs = await findAll('documents', locale)
-    if (docs.length) return docs.filter((doc) => text(doc.code) || text(doc.title)).map(mapDocument)
+    if (docs.length) return docs.filter((doc) => text(doc.code) || text(doc.title)).map((doc) => mapDocument(doc))
   } catch {
     /* fallback */
   }

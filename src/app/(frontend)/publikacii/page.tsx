@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { DigestForm, PubsDigest, PublicationsCatalog } from '@/components/PublicationsCatalog'
+import { CmsImage } from '@/components/CmsImage'
 import { Reveal, RevealHero } from '@/components/Reveal'
 import { publicationFilters } from '@/cms/filters'
 import { getPublications } from '@/cms/queries'
@@ -78,7 +79,7 @@ export default async function PublicationsPage() {
                   </Link>
                 </div>
                 <div className="pubs-featured__media">
-                  <Image
+                  <CmsImage
                     src={featured.image}
                     alt={t.featuredAlt}
                     fill

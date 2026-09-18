@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 
 import { CatalogSectionMark } from '@/components/CatalogSectionMark'
+import { ExpertsListLive } from '@/components/live/ExpertsListLive'
 import { Reveal, RevealHero, RevealItem, RevealStagger } from '@/components/Reveal'
 import { getExperts } from '@/cms/queries'
 import { getCatalog } from '@/i18n/catalog'
@@ -51,34 +52,7 @@ export default async function ExpertsPage() {
             <h2>{t.staffTitle}</h2>
             <p className="about-section-lead">{t.staffLead}</p>
           </Reveal>
-          <RevealStagger className="experts-list" stagger={0.08}>
-            {experts.map((expert) => (
-              <RevealItem key={expert.slug}>
-                <article className="experts-row">
-                  <div className="experts-row__media">
-                    <Image
-                      src={expert.image}
-                      alt={expert.name}
-                      fill
-                      quality={100}
-                      sizes="(max-width: 980px) 100vw, 200px"
-                    />
-                  </div>
-                  <div className="experts-row__body">
-                    <span className="experts-row__badge">{expert.title}</span>
-                    <h3>{expert.name}</h3>
-                    <p className="experts-row__creds">{expert.credentials}</p>
-                    <p className="experts-row__bio">{expert.bio}</p>
-                    <div className="experts-row__tags">
-                      {expert.tags.map((tag) => (
-                        <span key={tag}>{tag}</span>
-                      ))}
-                    </div>
-                  </div>
-                </article>
-              </RevealItem>
-            ))}
-          </RevealStagger>
+          <ExpertsListLive experts={experts} />
         </div>
       </section>
 

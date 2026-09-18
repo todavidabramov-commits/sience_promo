@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
 import React from 'react'
 
-import { SiteFooter } from '@/components/SiteFooter'
-import { SiteHeader } from '@/components/SiteHeader'
 import { ScrollToTop } from '@/components/ScrollToTop'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { SiteChrome } from '@/components/SiteChrome'
 import { getContacts } from '@/cms/queries'
 import { getLocale } from '@/i18n/get-locale'
 import { LocaleProvider } from '@/i18n/locale-context'
@@ -38,27 +37,12 @@ export default async function FrontendLayout({ children }: { children: React.Rea
     <html lang={locale}>
       <body>
         <LocaleProvider locale={locale}>
-          <LivePreviewListener />
-          <ScrollToTop />
-          <SiteHeader
-            companyName={contacts.companyName}
-            tagline={contacts.tagline}
-            phone={contacts.phone}
-            email={contacts.email}
-            address={contacts.address}
-            nav={contacts.nav}
-            ctaLabel={contacts.ctaLabel}
-            ctaHref={contacts.ctaHref}
-          />
-          <main>{children}</main>
-          <SiteFooter
-            companyName={contacts.companyName}
-            phone={contacts.phone}
-            email={contacts.email}
-            address={contacts.address}
-            legal={contacts.legal}
-            messages={messages}
-          />
+          <LivePreviewListener>
+            <ScrollToTop />
+            <SiteChrome contacts={contacts} messages={messages}>
+              {children}
+            </SiteChrome>
+          </LivePreviewListener>
         </LocaleProvider>
       </body>
     </html>

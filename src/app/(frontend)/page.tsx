@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { CountUp } from '@/components/CountUp'
+import { CmsImage } from '@/components/CmsImage'
 import { HeroMark } from '@/components/HeroMark'
 import { LeadForm } from '@/components/LeadForm'
 import { Reveal, RevealHero, RevealItem, RevealStagger } from '@/components/Reveal'
@@ -168,7 +169,7 @@ export default async function HomePage() {
               <RevealItem key={project.slug}>
                 <Link className="home-case" href={`/proekty/${project.slug}`}>
                   <div className="home-case__media">
-                    <Image
+                    <CmsImage
                       src={project.image}
                       alt={project.title}
                       fill
@@ -223,7 +224,7 @@ export default async function HomePage() {
               <RevealItem key={expert.slug}>
                 <article className="home-expert">
                   <div className="home-expert__media">
-                    <Image
+                    <CmsImage
                       src={expert.image}
                       alt={expert.name}
                       fill
